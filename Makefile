@@ -15,6 +15,12 @@ convHankakuTxt : convHankakuTxt.c
 hankaku.c : hankaku.txt convHankakuTxt
 	./convHankakuTxt
 
+hankaku.o : hankaku.c
+	i386-elf-gcc -c -m32 hankaku.c -o hankaku.o
+
+mysprintf.o : mysprintf.c
+	i386-elf-gcc -c -m32 -fno-builtin mysprintf.c -o mysprintf.o
+
 ipl10.bin : ipl10.nas Makefile
 	nasm ipl10.nas -o ipl10.bin -l ipl10.lst
 
@@ -24,8 +30,17 @@ asmhead.bin : asmhead.nas Makefile
 naskfunc.o : naskfunc.nas Makefile          # naskfunc.nasのバイナリファイル作成
 	nasm -g -f elf naskfunc.nas -o naskfunc.o -l naskfunc.lst
 
-bootpack.hrb : bootpack.c hrb.ld hankaku.c naskfunc.o mysprintf.c Makefile   # 自作のmysprintf.c の sprintfでは警告が出るので、-fno-builtinオプションを追加
-	i386-elf-gcc -march=i486 -m32 -nostdlib -fno-builtin -T hrb.ld -g bootpack.c hankaku.c naskfunc.o mysprintf.c -o bootpack.hrb
+bootpack.o : bootpack.c
+	i386-elf-gcc -c -m32 -fno-builtin bootpack.c -o bootpack.o
+
+graphic.o : graphic.c
+	i386-elf-gcc -c -m32 graphic.c -o graphic.o
+
+dsctbl.o : dsctbl.c
+	i386-elf-gcc -c -m32 dsctbl.c -o dsctbl.o
+
+bootpack.hrb : bootpack.o dsctbl.o graphic.o hankaku.o naskfunc.o mysprintf.o hrb.ld Makefile   # 自作のmysprintf.c の sprintfでは警告が出るので、-fno-builtinオプションを追加
+	i386-elf-gcc -march=i486 -m32 -nostdlib -fno-builtin -T hrb.ld -g bootpack.o dsctbl.o graphic.o hankaku.o naskfunc.o mysprintf.o -o bootpack.hrb
 
 haribote.sys : asmhead.bin bootpack.hrb Makefile
 	cat asmhead.bin bootpack.hrb > haribote.sys

@@ -28,20 +28,23 @@ void boxfill8(unsigned char *vram, int xsize, unsigned char c, int x0, int y0, i
 void init_palette(void);
 void set_palette(int start, int end, unsigned char *rgb);
 
+struct BOOTINFO {
+    char cyls, leds, vmode, reserve;
+    short scrnx, scrny;
+    char *vram;
+};
+
 void HariMain(void)
 {
     char *vram;
     int xsize, ysize;
-    short *binfo_scrnx, *binfo_scrny;
-    int *binfo_vram;
+    struct BOOTINFO *binfo;
 
     init_palette();
-    binfo_scrnx = (short *)0x0ff4;
-    binfo_scrny = (short *)0x0ff6;
-    binfo_vram = (int *)0x0ff8;
-    xsize = *binfo_scrnx;
-    ysize = *binfo_scrny;
-    vram = (char *) *binfo_vram;
+    binfo = (struct BOOTINFO *) 0x0ff0;
+    xsize = (*binfo).scrnx;
+    ysize = (*binfo).scrny;
+    vram = (*binfo).vram;
 
     boxfill8(vram, xsize, COL8_008484, 0,           0,          xsize - 1,  ysize - 29);
     boxfill8(vram, xsize, COL8_C6C6C6, 0,           ysize - 28, xsize - 1,  ysize - 28);

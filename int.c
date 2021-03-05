@@ -2,7 +2,10 @@
 
 #include "bootpack.h"
 
+
 #define PORT_KEYDAT     0x0060
+
+struct KEYBUF keybuf;
 
 void init_pic(void) {
 /* PICの初期化 */
@@ -28,17 +31,14 @@ void init_pic(void) {
 
 void inthandler21(int *esp) {
 /* PS/2キーボードからの割り込み */
-    struct BOOTINFO *binfo = (struct BOOTINFO *) ADR_BOOTINFO;
-    unsigned char data, s[4];
+    unsigned char data;
     io_out8(PIC0_OCW2, 0x61); /* IRQ-01受付完了をPICに通知 */
     data = io_in8(PORT_KEYDAT);
-
-    sprintf(s, "%x", data);
-    boxfill8(binfo->vram, binfo->scrnx, COL8_848484, 0, 16, 15, 31);
-    putfonts8_asc(binfo->vram, binfo->scrnx, 0, 16, COL8_FFFFFF, s);
-    for (;;) {
-        io_hlt();
+    if (keybuf.flag == 0) {
+        keybuf.data = data;
+        keybuf.flag = 1;
     }
+    return;
 }
 
 void inthandler2c(int *esp) {

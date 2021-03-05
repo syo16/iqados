@@ -54,8 +54,17 @@ void HariMain(void)
                 io_sti();
                 if (mouse_decode(&mdec, i) != 0) {
                     /* データが３倍と揃ったので表示 */
-                    sprintf(s, "%x %x %x", mdec.buf[0], mdec.buf[1], mdec.buf[2]);
-                    boxfill8(binfo->vram, binfo->scrnx, COL8_008484, 32, 16, 32 + 8 * 8 - 1, 31);
+                    sprintf(s, "[lcr %d %d]",mdec.x, mdec.y);
+                    if ((mdec.btn & 0x01) != 0) {
+                        s[1] = 'L';
+                    }
+                    if ((mdec.btn & 0x02) != 0) {
+                        s[3] = 'R';
+                    }
+                    if ((mdec.btn & 0x04) != 0) {
+                        s[2] = 'C';
+                    }
+                    boxfill8(binfo->vram, binfo->scrnx, COL8_008484, 32, 16, 32 + 15 * 8 - 1, 31);
                     putfonts8_asc(binfo->vram, binfo->scrnx, 32, 16, COL8_FFFFFF, s);
                 }
             }
@@ -103,8 +112,11 @@ int mouse_decode(struct MOUSE_DEC *mdec, unsigned char dat) {
     }
     if (mdec->phase == 1) {
         /* マウスの1バイト目を待っている段階 */
-        mdec->buf[0] = dat;
-        mdec->phase = 2;
+        if ((dat & 0xc8) == 0x08) {
+            /* 正しい１バイト目だった */
+            mdec->buf[0] = dat;
+            mdec->phase = 2;
+        }
         return 0;
     }
     if (mdec->phase == 2) {
@@ -117,6 +129,16 @@ int mouse_decode(struct MOUSE_DEC *mdec, unsigned char dat) {
         /* マウスの3バイト目を待っている段階 */
         mdec->buf[2] = dat;
         mdec->phase = 1;
+        mdec->btn = mdec->buf[0] & 0x07;
+        mdec->x = mdec->buf[1];
+        mdec->y = mdec->buf[2];
+        if ((mdec->buf[0] & 0x10) != 0) {
+            mdec->x |= 0xffffff00;
+        }
+        if ((mdec->buf[0] & 0x20) != 0) {
+            mdec->y |= 0xffffff00;
+        }
+        mdec->y = - mdec->y; /* マウスではy方向の符号が画面と反対 */
         return 1;
     }
     return -1; /* ここに来ることはないはず */

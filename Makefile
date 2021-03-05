@@ -24,8 +24,8 @@ asmhead.bin : asmhead.nas Makefile
 naskfunc.o : naskfunc.nas Makefile          # naskfunc.nasのバイナリファイル作成
 	nasm -g -f elf naskfunc.nas -o naskfunc.o -l naskfunc.lst
 
-bootpack.hrb : bootpack.c hankaku.c hrb.ld naskfunc.o Makefile       # リンク，コンパイル
-	i386-elf-gcc -march=i486 -m32 -nostdlib -T hrb.ld -g bootpack.c hankaku.c naskfunc.o -o bootpack.hrb
+bootpack.hrb : bootpack.c hrb.ld hankaku.c naskfunc.o mysprintf.c Makefile   # 自作のmysprintf.c の sprintfでは警告が出るので、-fno-builtinオプションを追加
+	i386-elf-gcc -march=i486 -m32 -nostdlib -fno-builtin -T hrb.ld -g bootpack.c hankaku.c naskfunc.o mysprintf.c -o bootpack.hrb
 
 haribote.sys : asmhead.bin bootpack.hrb Makefile
 	cat asmhead.bin bootpack.hrb > haribote.sys

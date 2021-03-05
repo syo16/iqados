@@ -1,3 +1,5 @@
+//#include <stdio.h> mysprintf.cで独自のsprintfを作成したので削除
+
 #define COL8_000000     0
 #define COL8_FF0000     1
 #define COL8_00FF00     2
@@ -30,6 +32,7 @@ void set_palette(int start, int end, unsigned char *rgb);
 void init_screen(char *vram, int xsize, int ysize);
 void putfont8(char *vram, int xsize, int x, int y, char c, char *font);
 void putfonts8_asc(char *vram, int xsize, int x, int y, char c, char *s);
+extern void sprintf(char *str, char *fmt, ...);     // mysprintf.c で、独自の sprintf を作成したので行追加
 
 struct BOOTINFO {
     char cyls, leds, vmode, reserve;
@@ -42,12 +45,16 @@ void HariMain(void)
 {
     struct BOOTINFO *binfo = (struct BOOTINFO *) 0x0ff0;
     extern char hankaku[4096];
+    char *s;
 
     init_palette();
     init_screen(binfo->vram, binfo->scrnx, binfo->scrny);
     putfonts8_asc(binfo->vram, binfo->scrnx, 8,     8,  COL8_FFFFFF, "ABC 123");
     putfonts8_asc(binfo->vram, binfo->scrnx, 31,    31, COL8_000000, "Haribote OS.");
     putfonts8_asc(binfo->vram, binfo->scrnx, 30,    30, COL8_FFFFFF, "Haribote OS.");
+
+    sprintf(s, "scrnx = %d", binfo->scrnx);
+    putfonts8_asc(binfo->vram, binfo->scrnx, 16,    64, COL8_FFFFFF, s);
 
 	for (;;) {
 		io_hlt();

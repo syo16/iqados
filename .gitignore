@@ -4,4 +4,6 @@
 *.sys
 *.hrb
 
+hankaku.c
+convHankakuTxt
 haribote.img

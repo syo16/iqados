@@ -7,6 +7,13 @@ default :
 	$(MAKE) img
 
 # ファイル生成規則
+#
+# convHankakuTxt.c は標準ライブラリが必要なので、macOS標準のgccを使う
+convHankakuTxt : convHankakuTxt.c
+	gcc convHankakuTxt.c -o convHankakuTxt
+
+hankaku.c : hankaku.txt convHankakuTxt
+	./convHankakuTxt
 
 ipl10.bin : ipl10.nas Makefile
 	nasm ipl10.nas -o ipl10.bin -l ipl10.lst
@@ -17,8 +24,8 @@ asmhead.bin : asmhead.nas Makefile
 naskfunc.o : naskfunc.nas Makefile          # naskfunc.nasのバイナリファイル作成
 	nasm -g -f elf naskfunc.nas -o naskfunc.o -l naskfunc.lst
 
-bootpack.hrb : bootpack.c hrb.ld naskfunc.o Makefile       # リンク，コンパイル
-	i386-elf-gcc -march=i486 -m32 -nostdlib -T hrb.ld -g bootpack.c naskfunc.o -o bootpack.hrb
+bootpack.hrb : bootpack.c hankaku.c hrb.ld naskfunc.o Makefile       # リンク，コンパイル
+	i386-elf-gcc -march=i486 -m32 -nostdlib -T hrb.ld -g bootpack.c hankaku.c naskfunc.o -o bootpack.hrb
 
 haribote.sys : asmhead.bin bootpack.hrb Makefile
 	cat asmhead.bin bootpack.hrb > haribote.sys
@@ -42,6 +49,8 @@ clean :
 	-$(DEL) *.o
 	-$(DEL) *.sys
 	-$(DEL) *.hrb
+	-$(DEL) hankaku.c
+	-$(DEL) convHankakuTxt
 
 src_only :
 	$(MAKE) clean

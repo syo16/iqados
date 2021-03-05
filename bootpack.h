@@ -131,5 +131,10 @@ void init_keyboard(void);
 #define KEYCMD_SENDTO_MOUSE     0xd4
 #define MOUSECMD_ENABLE         0xf4
 
-void enable_mouse(void);
+struct MOUSE_DEC {
+    unsigned char buf[3], phase;
+};
+
+void enable_mouse(struct MOUSE_DEC *mdec);
+int mouse_decode(struct MOUSE_DEC *mdec, unsigned char dat);
 

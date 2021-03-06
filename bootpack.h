@@ -192,3 +192,6 @@ void sheet_refresh(struct SHEET *sht, int bx0, int by0, int bx1, int by1);
 void sheet_slide(struct SHEET *sht, int vx0, int vy0);
 void sheet_free(struct SHEET *sht);
 void sheet_refreshsub(struct SHTCTL *ctl, int vx0, int vy0, int vx1, int vy1);
+
+/* bootpack.c */
+void make_window8(unsigned char *buf, int xsize, int ysize, char *title);

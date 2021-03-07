@@ -8,7 +8,8 @@ extern struct KEYBUF keybuf;
 void HariMain(void)
 {
     struct BOOTINFO *binfo = (struct BOOTINFO *) ADR_BOOTINFO;
-	char s[40], mcursor[256], keybuf[32], mousebuf[128];
+    struct FIFO8 timerfifo;
+	char s[40], keybuf[32], mousebuf[128], timerbuf[8];
 	int mx, my, i;
     unsigned int memtotal, count = 0;
     struct MOUSE_DEC mdec;
@@ -32,6 +33,9 @@ void HariMain(void)
     memman_init(memman);
     memman_free(memman, 0x00001000, 0x0009e000); /* 0x00001000 - 0x009efff */
     memman_free(memman, 0x00400000, memtotal - 0x00400000);
+
+    fifo8_init(&timerfifo, 8, timerbuf);
+    settimer(1000, &timerfifo, 1);
 
     init_palette();
     shtctl = shtctl_init(memman, binfo->vram, binfo->scrnx, binfo->scrny);
@@ -67,7 +71,7 @@ void HariMain(void)
         sheet_refresh(sht_win, 40, 28, 120, 44);
 
         io_cli();
-        if (fifo8_status(&keyfifo) + fifo8_status(&mousefifo) == 0) {
+        if (fifo8_status(&keyfifo) + fifo8_status(&mousefifo) + fifo8_status(&timerfifo) == 0) {
             io_sti();
         } else {
             if (fifo8_status(&keyfifo) != 0) {
@@ -116,6 +120,11 @@ void HariMain(void)
                     sheet_refresh(sht_back, 0, 0, 80, 16);
                     sheet_slide(sht_mouse, mx, my);
                 }
+            } else if (fifo8_status(&timerfifo) != 0) {
+                i = fifo8_get(&timerfifo); /* とりあえず読み込む（からにするために） */
+                io_sti();
+                putfonts8_asc(buf_back, binfo->scrnx, 0, 64, COL8_FFFFFF, "10[sec]");
+                sheet_refresh(sht_back, 0, 64, 56, 80);
             }
         }
 	}

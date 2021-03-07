@@ -231,3 +231,4 @@ void inthandler20(int *esp);
 
 /* bootpack.c */
 void make_window8(unsigned char *buf, int xsize, int ysize, char *title);
+void putfonts8_asc_sht(struct SHEET *sht, int x, int y, int c, int b, char *s, int l);

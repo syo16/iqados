@@ -4,8 +4,6 @@
 //#include <stdio.h> mysprintf.cで独自のsprintfを作成したので削除
 
 extern struct KEYBUF keybuf;
-extern struct FIFO8 keyfifo;
-extern struct FIFO8 mousefifo;
 
 void HariMain(void)
 {
@@ -25,7 +23,7 @@ void HariMain(void)
     fifo8_init(&keyfifo, 32, keybuf);
     fifo8_init(&mousefifo, 128, mousebuf);
     init_pit();
-    io_out8(PIC0_IMR, 0xf9); /* PIC1とキーボードを許可(11111001) */
+    io_out8(PIC0_IMR, 0xf8); /* PITとPIC1とキーボードを許可(11111000) */
     io_out8(PIC1_IMR, 0xef); /* マウスを許可(11101111) */
 
     init_keyboard();
@@ -63,8 +61,7 @@ void HariMain(void)
     sheet_refresh(sht_back, 0, 0, binfo->scrnx, 48);
 
 	for (;;) {
-        count++;
-        sprintf(s, "%d", count);
+        sprintf(s, "%d", timerctl.count);
         boxfill8(buf_win, 160, COL8_C6C6C6, 40, 28, 119, 43);
         putfonts8_asc(buf_win, 160, 40, 28, COL8_000000, s);
         sheet_refresh(sht_win, 40, 28, 120, 44);

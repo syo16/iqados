@@ -125,6 +125,8 @@ int fifo8_status(struct FIFO8 *fifo);
 #define KEYCMD_WRITE_MODE       0x60
 #define KBC_MODE                0x47
 
+extern struct FIFO8 keyfifo;
+
 void wait_KBC_sendready(void);
 void init_keyboard(void);
 void inthandler21(int *esp);
@@ -132,6 +134,8 @@ void inthandler21(int *esp);
 /* mouse.c */
 #define KEYCMD_SENDTO_MOUSE     0xd4
 #define MOUSECMD_ENABLE         0xf4
+
+extern struct FIFO8 mousefifo;
 
 struct MOUSE_DEC {
     unsigned char buf[3], phase;
@@ -198,6 +202,12 @@ void sheet_refreshmap(struct SHTCTL *ctl, int vx0, int vy0, int vx1, int vy1, in
 /* timer.c */
 #define PIT_CTRL        0x0043
 #define PIT_CNT0        0x0040
+
+struct TIMERCTL {
+    unsigned int count;
+};
+
+extern struct TIMERCTL timerctl;
 
 void init_pit(void);
 void inthandler20(int *esp);

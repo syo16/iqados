@@ -3,8 +3,6 @@
 #include "bootpack.h"
 
 struct KEYBUF keybuf;
-struct FIFO8 keyfifo;
-struct FIFO8 mousefifo;
 
 void init_pic(void) {
 /* PICの初期化 */

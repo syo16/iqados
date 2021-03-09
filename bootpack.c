@@ -28,10 +28,8 @@ void HariMain(void)
         '2', '3', '0', '.'
 	};
     struct TSS32 tss_a, tss_b;
+    struct SEGMENT_DESCRIPTOR *gdt = (struct SEGMENT_DESCRIPTOR *) ADR_GDT;
 
-    make_textbox8(sht_win, 8, 28, 144, 16, COL8_FFFFFF);
-    cursor_x = 8;
-    cursor_c = COL8_FFFFFF;
 
     init_gdtidt();
     init_pic();
@@ -91,7 +89,6 @@ void HariMain(void)
     tss_a.icmap = 0x40000000;
     tss_b.ldtr = 0;
     tss_b.icmap = 0x40000000;
-    struct SEGMENT_DESCRIPTOR *gdt = (struct SEGMENT_DESCRIPTOR *) ADR_GDT;
 
     set_segmdesc(gdt + 3, 103, (int)&tss_a, AR_TSS32);
     set_segmdesc(gdt + 4, 103, (int)&tss_b, AR_TSS32);
@@ -267,7 +264,25 @@ void make_textbox8(struct SHEET *sht, int x0, int y0, int sx, int sy, int c) {
 }
 
 void task_b_main(void) {
+    struct FIFO32 fifo;
+    struct TIMER *timer;
+    int i, fifobuf[128];
+
+    fifo32_init(&fifo, 128, fifobuf);
+    timer = timer_alloc();
+    timer_init(timer, &fifo, 1);
+    timer_settime(timer, 500);
     for (;;) {
-        io_hlt();
+        io_cli();
+        if (fifo32_status(&fifo) == 0) {
+            io_sti();
+            io_hlt();
+        } else {
+            i = fifo32_get(&fifo);
+            io_sti();
+            if (i == 1) { /* 5秒タイムアウト */
+                taskswitch3();
+            }
+        }
     }
 }

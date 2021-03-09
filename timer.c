@@ -68,7 +68,7 @@ void timer_settime(struct TIMER *timer, unsigned int timeout) {
         if (t == 0) {
             break; /* 一番うしろになった */
         }
-        if (timer->timeout >= t->timeout) {
+        if (timer->timeout <= t->timeout) {
             /* sとtの間に入れる場合 */
             s->next = timer; /* sの次はtimer */
             timer->next = t; /* timerの次はt */

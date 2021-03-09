@@ -17,8 +17,7 @@
         GLOBAL  load_cr0, store_cr0
         GLOBAL  memtest_sub
         GLOBAL  load_tr
-        GLOBAL  taskswitch4
-        GLOBAL  taskswitch3
+        GLOBAL  farjmp
         EXTERN  inthandler20, inthandler21, inthandler27, inthandler2c
 
 [SECTION .text]
@@ -208,10 +207,6 @@ load_tr:                                ; void load_tr(int tr);
 		LTR		[ESP+4]                 ; tr
 		RET
 
-taskswitch4:                            ; void taskswitch4(void);
-		JMP     4*8:0
-		RET
-
-taskswitch3:                            ; void taskswitch3(void);
-		JMP     3*8:0
+farjmp:                                 ; void farjmp(int eip, int cs);
+		JMP     FAR [ESP+4]             ; eip, cs 
 		RET

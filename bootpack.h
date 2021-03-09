@@ -108,20 +108,16 @@ void inthandler27(int *esp);
 
 /* fifo.c */
 
-struct FIFO8 {
-    unsigned char *buf;
-    int p, q, size, free, flags;
-};
-
 struct FIFO32 {
     int *buf;
     int p, q, size, free, flags;
+    struct TASK *task;
 };
 
 
 #define FLAGS_OVERRUN   0x0001
 
-void fifo32_init(struct FIFO32 *fifo, int size, int *buf);
+void fifo32_init(struct FIFO32 *fifo, int size, int *buf, struct TASK *task);
 int fifo32_put(struct FIFO32 *fifo, int data);
 int fifo32_get(struct FIFO32 *fifo);
 int fifo32_status(struct FIFO32 *fifo);
@@ -242,6 +238,7 @@ struct TASK *task_init(struct MEMMAN *memman);
 struct TASK *task_alloc(void);
 void task_run (struct TASK *task); 
 void task_switch(void); 
+void task_sleep(struct TASK *task);
 
 /* bootpack.c */
 
@@ -267,7 +264,7 @@ struct TASKCTL {
     struct TASK tasks0[MAX_TASKS];
 };
 
-void make_window8(unsigned char *buf, int xsize, int ysize, char *title);
+void make_window8(unsigned char *buf, int xsize, int ysize, char *title, char act);
 void make_textbox8(struct SHEET *sht, int x0, int y0, int sx, int sy, int c);
 void putfonts8_asc_sht(struct SHEET *sht, int x, int y, int c, int b, char *s, int l);
-void task_b_main(struct SHEET *sht_back);
+void task_b_main(struct SHEET *sht_win_b);

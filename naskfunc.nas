@@ -16,6 +16,8 @@
         GLOBAL  asm_inthandler20, asm_inthandler21, asm_inthandler27, asm_inthandler2c
         GLOBAL  load_cr0, store_cr0
         GLOBAL  memtest_sub
+        GLOBAL  load_tr
+        GLOBAL  taskswitch4
         EXTERN  inthandler20, inthandler21, inthandler27, inthandler2c
 
 [SECTION .text]
@@ -199,4 +201,12 @@ mts_fin:
 		POP		EBX
 		POP		ESI
 		POP		EDI
+		RET
+
+load_tr:                                ; void load_tr(int tr);
+		LTR		[ESP+4]                 ; tr
+		RET
+
+taskswitch4:                            ; void taskswitch(void);
+		JMP     4*8:0
 		RET

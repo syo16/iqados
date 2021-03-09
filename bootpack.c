@@ -97,7 +97,7 @@ void HariMain(void)
     set_segmdesc(gdt + 3, 103, (int)&tss_a, AR_TSS32);
     set_segmdesc(gdt + 4, 103, (int)&tss_b, AR_TSS32);
     load_tr(3 * 8);
-    task_b_esp = memman_alloc_4k(memman, 64 * 1024) + 64 * 1024;
+    task_b_esp = memman_alloc_4k(memman, 64 * 1024) + 64 * 1024 - 8;
     tss_b.eip = (int) &task_b_main;
     tss_b.eflags = 0x00000202; /* IF = 1 */
     tss_b.eax = 0;
@@ -114,7 +114,7 @@ void HariMain(void)
     tss_b.ds = 1 * 8;
     tss_b.fs = 1 * 8;
     tss_b.gs = 1 * 8;
-    *((int *) 0x0fec) = (int) sht_back;
+    *((int *)(task_b_esp + 4)) = (int) sht_back;
 
 	for (;;) {
         io_cli();
@@ -270,33 +270,40 @@ void make_textbox8(struct SHEET *sht, int x0, int y0, int sx, int sy, int c) {
 	return;
 }
 
-void task_b_main(void) {
+void task_b_main(struct SHEET *sht_back) {
     struct FIFO32 fifo;
-    struct TIMER *timer_ts;
-    int i, fifobuf[128], count = 0;
-    char s[11];
-    struct SHEET *sht_back;
+    struct TIMER *timer_put, *timer_1s;
+    int i, fifobuf[128], count = 0, count0 = 0;
+    char s[12];
 
     fifo32_init(&fifo, 128, fifobuf);
-    timer_ts = timer_alloc();
-    timer_init(timer_ts, &fifo, 1);
-    timer_settime(timer_ts, 2);
-    sht_back = (struct SHEET *) *((int *) 0x0fec);
+    timer_put = timer_alloc();
+    timer_init(timer_put, &fifo, 1);
+    timer_settime(timer_put, 1);
+    timer_1s = timer_alloc();
+    timer_init(timer_1s, &fifo, 100);
+    timer_settime(timer_1s, 100);
 
     for (;;) {
+        //task_b_main内for(;;)直下にシートを更新するプログラムが無いと、動作が遅くなる
         count++;
         sprintf(s, "%d", count);
-        putfonts8_asc_sht(sht_back, 0, 144, COL8_FFFFFF, COL8_008484, s, 10);
+		putfonts8_asc_sht(sht_back, 0, 144, COL8_FFFFFF, COL8_008484, s, 10);
         io_cli();
         if (fifo32_status(&fifo) == 0) {
             io_sti();
-            io_hlt();
         } else {
             i = fifo32_get(&fifo);
             io_sti();
-            if (i == 1) { /* 5秒タイムアウト */
-                farjmp(0, 3 * 8);
-                timer_settime(timer_ts, 2);
+            if (i == 1) {
+                //sprintf(s, "%d", count);
+                //putfonts8_asc_sht(sht_back, 0, 144, COL8_FFFFFF, COL8_008484, s, 11);
+                timer_settime(timer_put, 1);
+            } else if (i == 100) {
+                sprintf(s, "%d", count - count0);
+                putfonts8_asc_sht(sht_back, 0, 128, COL8_FFFFFF, COL8_008484, s, 11);
+                count0 = count;
+                timer_settime(timer_1s, 100);
             }
         }
     }

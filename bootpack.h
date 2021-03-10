@@ -250,6 +250,20 @@ void task_remove(struct TASK *task);
 void task_switchsub(void);
 void task_idle(void);
 
+/* window.c */
+void make_window8(unsigned char *buf, int xsize, int ysize, char *title, char act);
+void make_wtitle8(unsigned char *buf, int xsize, char *title, char act); 
+void make_textbox8(struct SHEET *sht, int x0, int y0, int sx, int sy, int c);
+void putfonts8_asc_sht(struct SHEET *sht, int x, int y, int c, int b, char *s, int l);
+
+/* console.c */
+void console_task(struct SHEET *sheet, unsigned int memtotal);
+int cons_newline(int cursor_y, struct SHEET *sheet);
+
+/* file.c */
+void file_readfat(int *fat, unsigned char *img); 
+void file_loadfile(int clustno, int size, char *buf, int *fat, char *img);
+
 /* bootpack.c */
 
 #define MAX_TASKS       1000 /* 最大タスク数 */
@@ -292,11 +306,3 @@ struct FILEINFO {
     unsigned int size;
 };
 
-void make_window8(unsigned char *buf, int xsize, int ysize, char *title, char act);
-void make_wtitle8(unsigned char *buf, int xsize, char *title, char act); 
-void make_textbox8(struct SHEET *sht, int x0, int y0, int sx, int sy, int c);
-void putfonts8_asc_sht(struct SHEET *sht, int x, int y, int c, int b, char *s, int l);
-void console_task(struct SHEET *sheet, unsigned int memtotal);
-int cons_newline(int cursor_y, struct SHEET *sheet);
-void file_readfat(int *fat, unsigned char *img); 
-void file_loadfile(int clustno, int size, char *buf, int *fat, char *img);

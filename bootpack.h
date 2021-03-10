@@ -1,13 +1,17 @@
 /* mysprint.c */
 void sprintf(char *str, char *fmt, ...);     // mysprintf.c で、独自の sprintf を作成したので行追加
 
+/* myfunction.c */
+int strcmp(char *s1, char *s2); 
+
 /* asmhead.nas */
-struct BOOTINFO {
+struct BOOTINFO { /* 0x0ff0 = 0x0fff */
     char cyls, leds, vmode, reserve;
     short scrnx, scrny;
     char *vram;
 };
 #define ADR_BOOTINFO    0x00000ff0
+#define ADR_DISKING     0x00100000
 
 /* naskfunc.nas */
 void io_hlt(void);
@@ -278,6 +282,13 @@ struct TASKCTL {
     char lv_change; /* 次回タスクスイッチのときに、レベルも変えたほうがいいかどうか */
     struct TASKLEVEL level[MAX_TASKLEVELS];
     struct TASK tasks0[MAX_TASKS];
+};
+
+struct FILEINFO {
+    unsigned char name[8], ext[3], type;
+    char reserve[10];
+    unsigned short time, date, clustno;
+    unsigned int size;
 };
 
 void make_window8(unsigned char *buf, int xsize, int ysize, char *title, char act);

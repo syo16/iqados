@@ -6,6 +6,7 @@
 void HariMain(void)
 {
     struct BOOTINFO *binfo = (struct BOOTINFO *) ADR_BOOTINFO;
+    struct SHTCTL *shtctl;
     struct FIFO32 fifo, keycmd;
     char s[40];
     int fifobuf[128], keycmd_buf[32];
@@ -13,7 +14,6 @@ void HariMain(void)
     unsigned int memtotal;
     struct MOUSE_DEC mdec;
     struct MEMMAN *memman = (struct MEMMAN *)MEMMAN_ADDR;
-    struct SHTCTL *shtctl;
     struct SHEET *sht_back, *sht_mouse, *sht_win, *sht_cons;
     unsigned char *buf_back, buf_mouse[256], *buf_win, *buf_cons;
     struct TASK *task_a, *task_cons;
@@ -388,7 +388,7 @@ void console_task(struct SHEET *sheet, unsigned int memtotal) {
     int x, y;
     char s[30], cmdline[30], *p;
     struct MEMMAN *memman = (struct MEMMAN *) MEMMAN_ADDR;
-    struct FILEINFO *finfo = (struct FILEINFO *) (ADR_DISKING + 0x002600);
+    struct FILEINFO *finfo = (struct FILEINFO *) (ADR_DISKIMG + 0x002600);
 
     fifo32_init(&task->fifo, 128, fifobuf, task);
     timer = timer_alloc();
@@ -481,7 +481,7 @@ void console_task(struct SHEET *sheet, unsigned int memtotal) {
                             }
                         }
                         cursor_y = cons_newline(cursor_y, sheet);
-                    } else if (cmdline[0] == 't' && cmdline[1] == 'y' && cmdline[2] == 'p' && cmdline[3] == 'e' && cmdline[4] == ' ') {
+                    } else if (strncmp(cmdline, "type ", 5) == 0) {
                         /* typeコマンド */
                         /* ファイル名を準備する */
                         for (y = 0; y < 11; y++) {
@@ -519,17 +519,36 @@ type_next_file:
                         if (x < 224 && finfo[x].name[0] != 0x00) {
                             /* ファイルが見つかった場合 */
                             y = finfo[x].size;
-                            p = (char *) (finfo[x].clustno * 512 + 0x003e00 + ADR_DISKING);
+                            p = (char *) (finfo[x].clustno * 512 + 0x003e00 + ADR_DISKIMG);
                             cursor_x = 8;
                             for (x = 0; x < y; x++) {
                                 /* 1文字ずつ出力 */
                                 s[0] = p[x];
                                 s[1] = 0;
-                                putfonts8_asc_sht(sheet, cursor_x, cursor_y, COL8_FFFFFF, COL8_000000, s, 1);
-                                cursor_x += 8;
-                                if (cursor_x == 8 + 240) { /* 右端まで来たので改行 */
+                                if (s[0] == 0x09) { /* タブ */
+                                    for (;;) {
+                                        putfonts8_asc_sht(sheet, cursor_x, cursor_y, COL8_FFFFFF, COL8_000000, " ", 1);
+                                        cursor_x += 8;
+                                        if (cursor_x == 8 + 240) {
+                                            cursor_x = 8;
+                                            cursor_y = cons_newline(cursor_y, sheet);
+                                        }
+                                        if (((cursor_x - 8) & 0x1f) == 0) {
+                                            break; /* 32で割り切れたらbreak */
+                                        }
+                                    }
+                                } else if (s[0] == 0x0a) { /* 改行 */
                                     cursor_x = 8;
                                     cursor_y = cons_newline(cursor_y, sheet);
+                                } else if (s[0] == 0x0d) { /* 復帰 */
+                                    /* とりあえず何もしない */
+                                } else { /* 普通の文字 */
+                                    putfonts8_asc_sht(sheet, cursor_x, cursor_y, COL8_FFFFFF, COL8_000000, s, 1);
+                                    cursor_x += 8;
+                                    if (cursor_x == 8 + 240) { /* 右端まで来たので改行 */
+                                        cursor_x = 8;
+                                        cursor_y = cons_newline(cursor_y, sheet);
+                                    }
                                 }
                             }
                         } else {
@@ -540,7 +559,7 @@ type_next_file:
                         cursor_y = cons_newline(cursor_y, sheet);
                     } else if (cmdline[0] != 0) {
                         /* コマンドでなく、空行でもない */
-                        putfonts8_asc_sht(sheet, 8, cursor_y, COL8_FFFFFF, COL8_000000, "Bad command", 12);
+                        putfonts8_asc_sht(sheet, 8, cursor_y, COL8_FFFFFF, COL8_000000, "Bad command.", 12);
                         cursor_y = cons_newline(cursor_y, sheet);
                         cursor_y = cons_newline(cursor_y, sheet);
                     }

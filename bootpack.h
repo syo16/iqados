@@ -3,6 +3,7 @@ void sprintf(char *str, char *fmt, ...);     // mysprintf.c で、独自の spri
 
 /* myfunction.c */
 int strcmp(char *s1, char *s2); 
+int strncmp(char *s1, char *s2, int n);
 
 /* asmhead.nas */
 struct BOOTINFO { /* 0x0ff0 = 0x0fff */
@@ -11,7 +12,7 @@ struct BOOTINFO { /* 0x0ff0 = 0x0fff */
     char *vram;
 };
 #define ADR_BOOTINFO    0x00000ff0
-#define ADR_DISKING     0x00100000
+#define ADR_DISKIMG     0x00100000
 
 /* naskfunc.nas */
 void io_hlt(void);

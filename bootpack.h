@@ -251,6 +251,7 @@ void task_idle(void);
 #define TASK_GDT0       3 /* TSSをGDTの何番から割り当てるのか */
 #define MAX_TASKS_LV    100
 #define MAX_TASKLEVELS  10
+#define KEYCMD_LED      0xed
 
 struct TSS32 {
     int backlink, esp0, ss0, esp1, ss1, esp2, ss2, cr3;

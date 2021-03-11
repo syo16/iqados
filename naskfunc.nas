@@ -18,10 +18,10 @@
         GLOBAL  memtest_sub
         GLOBAL  load_tr
         GLOBAL  farjmp
-        GLOBAL  asm_cons_putchar
         GLOBAL  farcall
+        GLOBAL  asm_hrb_api
         EXTERN  inthandler20, inthandler21, inthandler27, inthandler2c
-        EXTERN  cons_putchar
+        EXTERN hrb_api
 
 [SECTION .text]
 
@@ -218,13 +218,12 @@ farcall:                                ; void farcall(int eip, int cs);
 		CALL	FAR [ESP+4]
 		RET
 
-asm_cons_putchar:
+asm_hrb_api:
 		STI
-		PUSH	1
-		AND		EAX,0xff
-		PUSH	EAX
-		PUSH	DWORD [0x0fec]
-		CALL	cons_putchar
-		ADD		ESP,12
+		PUSHAD ;保存のためのPUSH
+		PUSHAD ;hrb_apiに渡すためのPUSH
+		CALL	hrb_api
+		ADD		ESP,32
+		POPAD
 		IRETD
 

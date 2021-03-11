@@ -118,37 +118,13 @@ asm_inthandler20:
 		PUSH	ES
 		PUSH	DS
 		PUSHAD
-		MOV		AX,SS
-		CMP		AX,1*8
-		JNE		.from_app
-		; Interuption detected
 		MOV		EAX,ESP
-		PUSH	SS
 		PUSH	EAX
 		MOV		AX,SS
 		MOV		DS,AX
 		MOV		ES,AX
 		CALL	inthandler20
-		ADD		ESP,8
-		POPAD
-		POP		DS
-		POP		ES
-		IRETD
-.from_app:
-		MOV		EAX,1*8
-		MOV		DS,AX
-		MOV		ECX,[0xfe4]
-		ADD		ECX,-8
-		MOV		[ECX+4],SS
-		MOV		[ECX],ESP
-		MOV		SS,AX
-		MOV		ES,AX
-		MOV		ESP,ECX
-		CALL	inthandler20
-		POP		ECX
 		POP		EAX
-		MOV		SS,AX
-		MOV		ESP,ECX
 		POPAD
 		POP		DS
 		POP		ES
@@ -158,37 +134,13 @@ asm_inthandler21:
 		PUSH	ES
 		PUSH	DS
 		PUSHAD
-		MOV		AX,SS
-		CMP		AX,1*8
-		JNE		.from_app
-
 		MOV		EAX,ESP
-		PUSH	SS
 		PUSH	EAX
 		MOV		AX,SS
 		MOV		DS,AX
 		MOV		ES,AX
 		CALL	inthandler21
-		ADD		ESP,8
-		POPAD
-		POP		DS
-		POP		ES
-		IRETD
-.from_app:
-		MOV		EAX,1*8
-		MOV		DS,AX
-		MOV		ECX,[0xfe4]
-		ADD		ECX,-8
-		MOV		[ECX+4],SS
-		MOV		[ECX],ESP
-		MOV		SS,AX
-		MOV		ES,AX
-		MOV		ESP,ECX
-		CALL	inthandler21
-		POP		ECX
 		POP		EAX
-		MOV		SS,AX
-		MOV		ESP,ECX
 		POPAD
 		POP		DS
 		POP		ES
@@ -198,37 +150,13 @@ asm_inthandler27:
 		PUSH	ES
 		PUSH	DS
 		PUSHAD
-		MOV		AX,SS
-		CMP		AX,1*8
-		JNE		.from_app
-
 		MOV		EAX,ESP
-		PUSH	SS
 		PUSH	EAX
 		MOV		AX,SS
 		MOV		DS,AX
 		MOV		ES,AX
 		CALL	inthandler27
-		ADD		ESP,8
-		POPAD
-		POP		DS
-		POP		ES
-		IRETD
-.from_app:
-		MOV		EAX,1*8
-		MOV		DS,AX
-		MOV		ECX,[0xfe4]
-		ADD		ECX,-8
-		MOV		[ECX+4],SS
-		MOV		[ECX],ESP
-		MOV		SS,AX
-		MOV		ES,AX
-		MOV		ESP,ECX
-		CALL	inthandler27
-		POP		ECX
 		POP		EAX
-		MOV		SS,AX
-		MOV		ESP,ECX
 		POPAD
 		POP		DS
 		POP		ES
@@ -238,37 +166,13 @@ asm_inthandler2c:
 		PUSH	ES
 		PUSH	DS
 		PUSHAD
-		MOV		AX,SS
-		CMP		AX,1*8
-		JNE		.from_app
-
 		MOV		EAX,ESP
-		PUSH	SS
 		PUSH	EAX
 		MOV		AX,SS
 		MOV		DS,AX
 		MOV		ES,AX
 		CALL	inthandler2c
-		ADD		ESP,8
-		POPAD
-		POP		DS
-		POP		ES
-		IRETD
-.from_app:
-		MOV		EAX,1*8
-		MOV		DS,AX
-		MOV		ECX,[0xfe4]
-		ADD		ECX,-8
-		MOV		[ECX+4],SS
-		MOV		[ECX],ESP
-		MOV		SS,AX
-		MOV		ES,AX
-		MOV		ESP,ECX
-		CALL	inthandler2c
-		POP		ECX
 		POP		EAX
-		MOV		SS,AX
-		MOV		ESP,ECX
 		POPAD
 		POP		DS
 		POP		ES
@@ -279,59 +183,20 @@ asm_inthandler0d:
 		PUSH	ES
 		PUSH	DS
 		PUSHAD
-		MOV		AX,SS
-		CMP		AX,1*8
-		JNE		.from_app
-		; Interuption detected
 		MOV		EAX,ESP
-		PUSH	SS
 		PUSH	EAX
 		MOV		AX,SS
 		MOV		DS,AX
 		MOV		ES,AX
 		CALL	inthandler0d
-		ADD		ESP,8
-		POPAD
-		POP		DS
-		POP		ES
-		ADD		ESP,4	
-		IRETD
-.from_app:
-		CLI
-		MOV		EAX,1*8
-		MOV		DS,AX
-		MOV		ECX,[0xfe4]
-		ADD		ECX,-8
-		MOV		[ECX+4],SS
-		MOV		[ECX],ESP
-		MOV		SS,AX
-		MOV		ES,AX
-		MOV		ESP,ECX
-		STI
-		CALL	inthandler0d
-		CLI
 		CMP		EAX,0
-		JNE		.kill
-		POP		ECX
+		JNE		end_app
 		POP		EAX
-		MOV		SS,AX
-		MOV		ESP,ECX
 		POPAD
 		POP		DS
 		POP		ES
 		ADD		ESP,4
 		IRETD
-.kill
-		MOV		EAX,1*8
-		MOV		ES,AX
-		MOV		SS,AX
-		MOV		DS,AX
-		MOV		FS,AX
-		MOV		GS,AX
-		MOV		ESP,[0xfe4]
-		STI
-		POPAD
-		RET
 
 memtest_sub:	; unsigned int memtest_sub(unsigned int start, unsigned int end)
 		PUSH	EDI						; （EBX, ESI, EDI も使いたいので）
@@ -376,50 +241,27 @@ farcall:                                ; void farcall(int eip, int cs);
 		RET
 
 asm_hrb_api:
+		STI
 		PUSH	DS
 		PUSH	ES
 		PUSHAD
-		MOV		EAX,1*8
+		PUSHAD
+		MOV	    AX,SS
 		MOV		DS,AX
-		MOV		ECX,[0xfe4]
-		ADD		ECX,-40
-		MOV		[ECX+32],ESP
-		MOV		[ECX+36],SS
-
-; PUSHADした値をシステムのスタックにコピーする
-		MOV		EDX,[ESP]
-		MOV		EBX,[ESP+4]
-		MOV		[ECX],EDX
-		MOV		[ECX+4],EBX
-		MOV		EDX,[ESP+8]
-		MOV		EBX,[ESP+12]
-		MOV		[ECX+8],EDX
-		MOV		[ECX+12],EBX
-		MOV		EDX,[ESP+16]
-		MOV		EBX,[ESP+20]
-		MOV		[ECX+16],EDX
-		MOV		[ECX+20],EBX
-		MOV		EDX,[ESP+24]
-		MOV		EBX,[ESP+28]
-		MOV		[ECX+24],EDX
-		MOV		[ECX+28],EBX
-
 		MOV		ES,AX
-		MOV		SS,AX
-		MOV		ESP,ECX
-		STI
-
 		CALL	hrb_api
-
-		MOV		ECX,[ESP+32]
-		MOV		EAX,[ESP+36]
-		CLI
-		MOV		SS,AX
-		MOV		ESP,ECX
+		CMP		EAX,0
+		JNE		end_app
+		ADD     ESP,32
 		POPAD
-		POP		ES
-		POP		DS
+		POP     ES 
+		POP     DS 
 		IRETD
+
+end_app:
+		MOV		ESP,[EAX]
+		POPAD
+		RET
 
 start_app:
 		PUSHAD
@@ -427,29 +269,17 @@ start_app:
 		MOV		ECX,[ESP+40]
 		MOV		EDX,[ESP+44]
 		MOV		EBX,[ESP+48]
-		MOV		[0xfe4],ESP
-		CLI
+		MOV		EBP,[ESP+52]
+		MOV		[EBP],ESP
+		MOV		[EBP+4],SS
 		MOV		ES,BX
-		MOV		SS,BX
 		MOV		DS,BX
 		MOV		FS,BX
 		MOV		GS,BX
-		MOV		ESP,EDX
-		STI
+		OR		ECX,3
+		OR		EBX,3
+		PUSH	EBX	
+		PUSH	EDX	
 		PUSH	ECX	
 		PUSH	EAX
-		CALL	FAR [ESP]
-
-; アプリが終了するとここに帰ってくる
-
-		MOV		EAX,1*8
-		CLI
-		MOV		ES,AX
-		MOV		SS,AX
-		MOV		DS,AX
-		MOV		FS,AX
-		MOV		GS,AX
-		MOV		ESP,[0xfe4]
-		STI
-		POPAD
-		RET
+		RETF

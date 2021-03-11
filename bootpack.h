@@ -36,7 +36,7 @@ void store_cr0(int cr0);
 void load_tr(int tr);
 void farjmp(int eip, int cs);
 void farcall(int eip, int cs);
-void start_app(int eip, int cs, int esp, int ds);
+void start_app(int eip, int cs, int esp, int ds, int *tss_esp0);
 
 /* graphic.c */
 
@@ -277,8 +277,8 @@ void cmd_type(struct CONSOLE *cons, int *fat, char *cmdline);
 int cmd_app(struct CONSOLE *cons, int *fat, char *cmdline); 
 void cons_putstr0(struct CONSOLE *cons, char *s); 
 void cons_putstr1(struct CONSOLE *cons, char *s, int l); 
-void hrb_api(int edi, int esi, int ebp, int esp, int ebx, int edx, int ecx, int eax); 
-int inthandler0d(int *esp);
+int *hrb_api(int edi, int esi, int ebp, int esp, int ebx, int edx, int ecx, int eax); 
+int *inthandler0d(int *esp);
 
 /* file.c */
 void file_readfat(int *fat, unsigned char *img); 

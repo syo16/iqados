@@ -29,6 +29,7 @@ void asm_inthandler20(void);
 void asm_inthandler21(void);
 void asm_inthandler27(void);
 void asm_inthandler2c(void);
+void asm_inthandler0d(void);
 void asm_hrb_api(void);
 int load_cr0(void);
 void store_cr0(int cr0);
@@ -277,6 +278,7 @@ int cmd_app(struct CONSOLE *cons, int *fat, char *cmdline);
 void cons_putstr0(struct CONSOLE *cons, char *s); 
 void cons_putstr1(struct CONSOLE *cons, char *s, int l); 
 void hrb_api(int edi, int esi, int ebp, int esp, int ebx, int edx, int ecx, int eax); 
+int inthandler0d(int *esp);
 
 /* file.c */
 void file_readfat(int *fat, unsigned char *img); 

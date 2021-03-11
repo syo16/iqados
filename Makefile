@@ -29,8 +29,9 @@ asmhead.bin : asmhead.nas Makefile
 naskfunc.o : naskfunc.nas Makefile          # naskfunc.nasのバイナリファイル作成
 	nasm -g -f elf $< -o $@ -l naskfunc.lst
 
+# https://gcc.gnu.org/onlinedocs/gcc/Link-Options.html
 bootpack.hrb : $(OBJS_BOOTPACK) hrb.ld Makefile   # 自作のmysprintf.c の sprintfでは警告が出るので、-fno-builtinオプションを追加
-	$(CC) $(CFLAGS) -march=i486 -nostdlib -T hrb.ld -g $(OBJS_BOOTPACK) -o $@
+	$(CC) $(CFLAGS) -march=i486 -nostdlib -T hrb.ld -Xlinker -Map=bootpack.map -g $(OBJS_BOOTPACK) -o $@
 
 hlt.hrb : hlt.nas Makefile
 	nasm $< -o $@ -l hlt.lst
@@ -62,6 +63,7 @@ clean :
 	-$(DEL) *.o
 	-$(DEL) *.sys
 	-$(DEL) *.hrb
+	-$(DEL) *.map
 	-$(DEL) hankaku.c
 	-$(DEL) convHankakuTxt
 

@@ -19,6 +19,7 @@
         GLOBAL  load_tr
         GLOBAL  farjmp
         GLOBAL  asm_cons_putchar
+        GLOBAL  farcall
         EXTERN  inthandler20, inthandler21, inthandler27, inthandler2c
         EXTERN  cons_putchar
 
@@ -213,6 +214,10 @@ farjmp:                                 ; void farjmp(int eip, int cs);
 		JMP     FAR [ESP+4]             ; eip, cs 
 		RET
 
+farcall:                                ; void farcall(int eip, int cs);
+		CALL	FAR [ESP+4]
+		RET
+
 asm_cons_putchar:
 		PUSH	1
 		AND		EAX,0xff
@@ -221,3 +226,4 @@ asm_cons_putchar:
 		CALL	cons_putchar
 		ADD		ESP,12
 		RETF
+

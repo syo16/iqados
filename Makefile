@@ -33,15 +33,15 @@ naskfunc.o : naskfunc.nas Makefile          # naskfunc.nasのバイナリファ�
 bootpack.hrb : $(OBJS_BOOTPACK) hrb.ld Makefile   # 自作のmysprintf.c の sprintfでは警告が出るので、-fno-builtinオプションを追加
 	$(CC) $(CFLAGS) -march=i486 -nostdlib -T hrb.ld -Xlinker -Map=bootpack.map -g $(OBJS_BOOTPACK) -o $@
 
-hlt.hrb : hlt.nas Makefile
-	nasm $< -o $@ -l hlt.lst
+hello.hrb : hello.nas Makefile
+	nasm $< -o $@ -l hello.lst
 
 haribote.sys : asmhead.bin bootpack.hrb Makefile
 	cat asmhead.bin bootpack.hrb > haribote.sys
 
-haribote.img : ipl10.bin haribote.sys hlt.hrb Makefile
+haribote.img : ipl10.bin haribote.sys hello.hrb Makefile
 	mformat -f 1440 -C -B ipl10.bin -i haribote.img ::
-	mcopy -i haribote.img haribote.sys ipl10.nas make.bat hlt.hrb ::
+	mcopy -i haribote.img haribote.sys ipl10.nas make.bat hello.hrb ::
 
 # 一般規則
 

@@ -39,17 +39,26 @@ hello.hrb : hello.nas Makefile
 hello2.hrb : hello2.nas Makefile
 	nasm $< -o $@ -l hello2.lst
 
+a.hrb : a.o a_nask.o app.ld Makefile
+	$(CC) $(CFLAGS) -march=i486 -nostdlib -T app.ld -g a.o a_nask.o -o $@
+
+hello3.hrb : hello3.o a_nask.o app.ld 
+	$(CC) $(CFLAGS) -march=i486 -nostdlib -T app.ld -g hello3.o a_nask.o -o $@
+
 haribote.sys : asmhead.bin bootpack.hrb Makefile
 	cat asmhead.bin bootpack.hrb > haribote.sys
 
-haribote.img : ipl10.bin haribote.sys hello.hrb hello2.hrb Makefile
+haribote.img : ipl10.bin haribote.sys hello.hrb hello2.hrb a.hrb hello3.hrb Makefile
 	mformat -f 1440 -C -B ipl10.bin -i haribote.img ::
-	mcopy -i haribote.img haribote.sys ipl10.nas make.bat hello.hrb hello2.hrb ::
+	mcopy -i haribote.img haribote.sys ipl10.nas make.bat hello.hrb hello2.hrb a.hrb hello3.hrb ::
 
 # 一般規則
 
 %.o : %.c
 	$(CC) $(CFLAGS) -c $*.c -o $*.o
+
+%.o : %.nas
+	nasm -g -f elf $*.nas -o $*.o -l $*.lst
 
 # コマンド
 

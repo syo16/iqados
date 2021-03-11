@@ -4,6 +4,9 @@ DEL      = rm -f
 
 CC = i386-elf-gcc
 CFLAGS = -m32 -fno-builtin
+COPTION = -march=i486 -nostdlib
+COSLD = -T hrb.ld
+CAPPLD = -T app.ld
 
 # デフォルト動作
 
@@ -31,7 +34,7 @@ naskfunc.o : naskfunc.nas Makefile          # naskfunc.nasのバイナリファ�
 
 # https://gcc.gnu.org/onlinedocs/gcc/Link-Options.html
 bootpack.hrb : $(OBJS_BOOTPACK) hrb.ld Makefile   # 自作のmysprintf.c の sprintfでは警告が出るので、-fno-builtinオプションを追加
-	$(CC) $(CFLAGS) -march=i486 -nostdlib -T hrb.ld -Xlinker -Map=bootpack.map -g $(OBJS_BOOTPACK) -o $@
+	$(CC) $(CFLAGS) $(COPTION) -T hrb.ld -Xlinker -Map=bootpack.map -g $(OBJS_BOOTPACK) -o $@
 
 hello.hrb : hello.nas Makefile
 	nasm $< -o $@ -l hello.lst
@@ -40,17 +43,20 @@ hello2.hrb : hello2.nas Makefile
 	nasm $< -o $@ -l hello2.lst
 
 a.hrb : a.o a_nask.o app.ld Makefile
-	$(CC) $(CFLAGS) -march=i486 -nostdlib -T app.ld -g a.o a_nask.o -o $@
+	$(CC) $(CFLAGS) $(COPTION) $(CAPPLD) -g a.o a_nask.o -o $@
 
 hello3.hrb : hello3.o a_nask.o app.ld 
-	$(CC) $(CFLAGS) -march=i486 -nostdlib -T app.ld -g hello3.o a_nask.o -o $@
+	$(CC) $(CFLAGS) $(COPTION) $(CAPPLD) -g hello3.o a_nask.o -o $@
+
+crack1.hrb : crack1.o app.ld
+	$(CC) $(CFLAGS) $(COPTION) $(CAPPLD) -g crack1.o -o $@
 
 haribote.sys : asmhead.bin bootpack.hrb Makefile
 	cat asmhead.bin bootpack.hrb > haribote.sys
 
-haribote.img : ipl10.bin haribote.sys hello.hrb hello2.hrb a.hrb hello3.hrb Makefile
+haribote.img : ipl10.bin haribote.sys hello.hrb hello2.hrb a.hrb hello3.hrb crack1.hrb Makefile
 	mformat -f 1440 -C -B ipl10.bin -i haribote.img ::
-	mcopy -i haribote.img haribote.sys ipl10.nas make.bat hello.hrb hello2.hrb a.hrb hello3.hrb ::
+	mcopy -i haribote.img haribote.sys ipl10.nas make.bat hello.hrb hello2.hrb a.hrb hello3.hrb crack1.hrb ::
 
 # 一般規則
 

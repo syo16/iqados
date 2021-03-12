@@ -1,7 +1,7 @@
 OBJS_BOOTPACK = bootpack.o graphic.o dsctbl.o naskfunc.o hankaku.o mysprintf.o int.o fifo.o keyboard.o mouse.o memory.o sheet.o timer.o mtask.o myfunction.o window.o console.o file.o
 
-IMG_REQUISITE = ipl10.bin haribote.sys hello.hrb hello2.hrb a.hrb hello3.hrb hello4.hrb hello5.hrb bug1.hrb bug2.hrb bug3.hrb
-IMG_COPY = haribote.sys ipl10.nas make.bat hello.hrb hello2.hrb a.hrb hello3.hrb hello4.hrb hello5.hrb bug1.hrb bug2.hrb bug3.hrb
+IMG_REQUISITE = ipl10.bin haribote.sys hello.hrb hello2.hrb a.hrb hello3.hrb hello4.hrb hello5.hrb winhelo.hrb winhelo2.hrb bug1.hrb bug2.hrb bug3.hrb
+IMG_COPY = haribote.sys ipl10.nas make.bat hello.hrb hello2.hrb a.hrb hello3.hrb hello4.hrb hello5.hrb winhelo.hrb winhelo2.hrb bug1.hrb bug2.hrb bug3.hrb
 
 MAKE     = make -r
 DEL      = rm -f
@@ -57,6 +57,12 @@ hello4.hrb : hello4.o a_nask.o app.ld
 
 hello5.hrb : hello5.o app.ld
 	$(CC) $(CFLAGS) $(COPTION) $(CAPPLD) -g hello5.o -o $@
+
+winhelo.hrb : winhelo.o a_nask.o app.ld 
+	$(CC) $(CFLAGS) $(COPTION) $(CAPPLD) -g winhelo.o a_nask.o -o $@
+
+winhelo2.hrb : winhelo2.o a_nask.o app.ld 
+	$(CC) $(CFLAGS) $(COPTION) $(CAPPLD) -g winhelo2.o a_nask.o -o $@
 
 bug1.hrb : bug1.o a_nask.o app.ld 
 	$(CC) $(CFLAGS) $(COPTION) $(CAPPLD) -g bug1.o a_nask.o -o $@

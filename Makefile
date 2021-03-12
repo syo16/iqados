@@ -1,7 +1,7 @@
 OBJS_BOOTPACK = bootpack.o graphic.o dsctbl.o naskfunc.o hankaku.o mysprintf.o int.o fifo.o keyboard.o mouse.o memory.o sheet.o timer.o mtask.o myfunction.o window.o console.o file.o
 
-IMG_REQUISITE = ipl10.bin haribote.sys hello.hrb hello2.hrb a.hrb hello3.hrb bug1.hrb
-IMG_COPY = haribote.sys ipl10.nas make.bat hello.hrb hello2.hrb a.hrb hello3.hrb bug1.hrb
+IMG_REQUISITE = ipl10.bin haribote.sys hello.hrb hello2.hrb a.hrb hello3.hrb hello4.hrb hello5.hrb bug1.hrb bug2.hrb bug3.hrb
+IMG_COPY = haribote.sys ipl10.nas make.bat hello.hrb hello2.hrb a.hrb hello3.hrb hello4.hrb hello5.hrb bug1.hrb bug2.hrb bug3.hrb
 
 MAKE     = make -r
 DEL      = rm -f
@@ -52,8 +52,20 @@ a.hrb : a.o a_nask.o app.ld Makefile
 hello3.hrb : hello3.o a_nask.o app.ld 
 	$(CC) $(CFLAGS) $(COPTION) $(CAPPLD) -g hello3.o a_nask.o -o $@
 
+hello4.hrb : hello4.o a_nask.o app.ld 
+	$(CC) $(CFLAGS) $(COPTION) $(CAPPLD) -g hello4.o a_nask.o -o $@
+
+hello5.hrb : hello5.o app.ld
+	$(CC) $(CFLAGS) $(COPTION) $(CAPPLD) -g hello5.o -o $@
+
 bug1.hrb : bug1.o a_nask.o app.ld 
 	$(CC) $(CFLAGS) $(COPTION) $(CAPPLD) -g bug1.o a_nask.o -o $@
+
+bug2.hrb : bug2.o a_nask.o app.ld 
+	$(CC) $(CFLAGS) $(COPTION) $(CAPPLD) -g bug2.o a_nask.o -o $@
+
+bug3.hrb : bug3.o a_nask.o app.ld 
+	$(CC) $(CFLAGS) $(COPTION) $(CAPPLD) -g bug3.o a_nask.o -o $@
 
 haribote.sys : asmhead.bin bootpack.hrb Makefile
 	cat asmhead.bin bootpack.hrb > haribote.sys

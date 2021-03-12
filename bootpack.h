@@ -224,7 +224,7 @@ void sheet_refreshmap(struct SHTCTL *ctl, int vx0, int vy0, int vx1, int vy1, in
 
 struct TIMER {
     struct TIMER *next;
-    unsigned int timeout, flags;
+    unsigned int timeout, flags, flags2;
     struct FIFO32 *fifo;
     int data;
 };
@@ -243,6 +243,8 @@ void timer_free(struct TIMER *timer);
 void timer_init(struct TIMER *timer, struct FIFO32 *fifo, int data);
 void timer_settime(struct TIMER *timer, unsigned int timeout);
 void inthandler20(int *esp);
+int timer_cancel(struct TIMER *timer);
+void timer_cancelall(struct FIFO32 *fifo);
 
 /* mtask.c */
 extern struct TIMER *task_timer;

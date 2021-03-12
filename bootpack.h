@@ -266,6 +266,7 @@ void putfonts8_asc_sht(struct SHEET *sht, int x, int y, int c, int b, char *s, i
 struct CONSOLE {
     struct SHEET *sht;
     int cur_x, cur_y, cur_c;
+    struct TIMER *timer;
 };
 
 void console_task(struct SHEET *sheet, unsigned int memtotal);

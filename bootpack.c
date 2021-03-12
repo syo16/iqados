@@ -40,6 +40,8 @@ void HariMain(void)
     struct TIMER *timer;
     int key_to = 0, key_shift = 0, key_leds = (binfo->leds >> 4) & 7, keycmd_wait = -1;
     struct CONSOLE *cons;
+    int j, x, y;
+    struct SHEET *sht;
 
     init_gdtidt();
     init_pic();
@@ -246,6 +248,9 @@ void HariMain(void)
                         fifo32_put(&task_cons->fifo, 10 + 256);
                     }
                 }
+                if (i == 256 + 0x58 && shtctl->top > 2) { /* F12 */
+                    sheet_updown(shtctl->sheets[1], shtctl->top - 1);
+                }
                 /* カーソルの再表示 */
                 if (cursor_c >= 0) {
                     boxfill8(sht_win->buf, sht_win->bxsize, cursor_c, cursor_x, 28, cursor_x + 7, 43);
@@ -284,8 +289,19 @@ void HariMain(void)
                     //putfonts8_asc_sht(sht_back, 0, 0, COL8_FFFFFF, COL8_008484, s, 10);
                     sheet_slide(sht_mouse, mx, my);
                     if ((mdec.btn & 0x01) != 0) {
-                        /* 左ボタンを押していたら、sht_winを動かす */
-                        sheet_slide(sht_win, mx - 80, my - 8);
+                        /* 左ボタンを押している */
+                        /* 上の下敷きから順番にマウスが指している下敷きを探す */
+                        for (j = shtctl->top - 1; j > 0; j--) {
+                            sht = shtctl->sheets[j];
+                            x = mx - sht->vx0;
+                            y = my - sht->vy0;
+                            if (0 <= x && x < sht->bxsize && 0 <= y && y < sht->bysize) {
+                                if (sht->buf[y * sht->bxsize + x] != sht->col_inv) {
+                                    sheet_updown(sht, shtctl->top - 1);
+                                    break;
+                                }
+                            }
+                        }
                     }
                 }
             } else if (i <= 1) { /* カーソル用タイマ */

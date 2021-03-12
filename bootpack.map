@@ -62,12 +62,12 @@ LOAD file.o
                 0x0000000000000008        0x4 LONG 0x0
                 0x000000000000000c        0x4 LONG 0x310000
                 0x0000000000000010        0x4 LONG 0x1425 SIZEOF (.data)
-                0x0000000000000014        0x4 LONG 0x56dd LOADADDR (.data)
+                0x0000000000000014        0x4 LONG 0x5791 LOADADDR (.data)
                 0x0000000000000018        0x4 LONG 0xe9000000
                 0x000000000000001c        0x4 LONG 0x10 (HariMain - 0x20)
                 0x0000000000000020        0x4 LONG 0x0
 
-.text           0x0000000000000030     0x56ad
+.text           0x0000000000000030     0x5761
  *(.text)
  .text          0x0000000000000030      0xe76 bootpack.o
                 0x0000000000000030                HariMain
@@ -185,7 +185,7 @@ LOAD file.o
                 0x0000000000003c3b                putfonts8_asc_sht
                 0x0000000000003cda                make_textbox8
                 0x0000000000003ed9                change_wtitle8
- .text          0x0000000000003fbe     0x1474 console.o
+ .text          0x0000000000003fbe     0x1528 console.o
                 0x0000000000003fbe                console_task
                 0x0000000000004370                cons_putchar
                 0x0000000000004475                cons_newline
@@ -198,15 +198,15 @@ LOAD file.o
                 0x0000000000004c62                cons_putstr0
                 0x0000000000004c92                cons_putstr1
                 0x0000000000004cd2                hrb_api
-                0x000000000000524a                inthandler0c
-                0x00000000000052ac                inthandler0d
-                0x000000000000530e                hrb_api_linewin
- .text          0x0000000000005432      0x2ab file.o
-                0x0000000000005432                file_readfat
-                0x00000000000054dc                file_loadfile
-                0x0000000000005580                file_search
+                0x00000000000052fe                inthandler0c
+                0x0000000000005360                inthandler0d
+                0x00000000000053c2                hrb_api_linewin
+ .text          0x00000000000054e6      0x2ab file.o
+                0x00000000000054e6                file_readfat
+                0x0000000000005590                file_loadfile
+                0x0000000000005634                file_search
 
-.data           0x0000000000310000     0x1425 load address 0x00000000000056dd
+.data           0x0000000000310000     0x1425 load address 0x0000000000005791
  *(.data)
  .data          0x0000000000310000      0x100 bootpack.o
  .data          0x0000000000310100      0x140 graphic.o
@@ -296,7 +296,7 @@ OUTPUT(bootpack.hrb binary)
 .debug_loc      0x0000000000000000        0x0
  .debug_loc     0x0000000000000000        0x0 naskfunc.o
 
-.bss            0x0000000000311440     0x2f34 load address 0x0000000000006b20
+.bss            0x0000000000311440     0x2f34 load address 0x0000000000006be0
  COMMON         0x0000000000311440       0x2c int.o
                 0x0000000000311440                keybuf
  COMMON         0x000000000031146c        0x8 keyboard.o

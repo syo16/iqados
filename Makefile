@@ -1,4 +1,8 @@
 OBJS_BOOTPACK = bootpack.o graphic.o dsctbl.o naskfunc.o hankaku.o mysprintf.o int.o fifo.o keyboard.o mouse.o memory.o sheet.o timer.o mtask.o myfunction.o window.o console.o file.o
+
+IMG_REQUISITE = ipl10.bin haribote.sys hello.hrb hello2.hrb a.hrb hello3.hrb bug1.hrb
+IMG_COPY = haribote.sys ipl10.nas make.bat hello.hrb hello2.hrb a.hrb hello3.hrb bug1.hrb
+
 MAKE     = make -r
 DEL      = rm -f
 
@@ -48,30 +52,15 @@ a.hrb : a.o a_nask.o app.ld Makefile
 hello3.hrb : hello3.o a_nask.o app.ld 
 	$(CC) $(CFLAGS) $(COPTION) $(CAPPLD) -g hello3.o a_nask.o -o $@
 
-crack1.hrb : crack1.o a_nask.o app.ld
-	$(CC) $(CFLAGS) $(COPTION) $(CAPPLD) -g crack1.o a_nask.o -o $@
-
-crack2.hrb : crack2.nas
-	nasm $< -o $@ -l crack2.lst
-
-crack3.hrb : crack3.nas
-	nasm $< -o $@ -l crack3.lst
-
-crack4.hrb : crack4.nas
-	nasm $< -o $@ -l crack4.lst
-
-crack5.hrb : crack5.nas
-	nasm $< -o $@ -l crack5.lst
-
-crack6.hrb : crack6.nas
-	nasm $< -o $@ -l crack6.lst
+bug1.hrb : bug1.o a_nask.o app.ld 
+	$(CC) $(CFLAGS) $(COPTION) $(CAPPLD) -g bug1.o a_nask.o -o $@
 
 haribote.sys : asmhead.bin bootpack.hrb Makefile
 	cat asmhead.bin bootpack.hrb > haribote.sys
 
-haribote.img : ipl10.bin haribote.sys hello.hrb hello2.hrb a.hrb hello3.hrb crack1.hrb crack2.hrb crack3.hrb crack4.hrb crack5.hrb crack6.hrb Makefile
+haribote.img : $(IMG_REQUISITE) Makefile
 	mformat -f 1440 -C -B ipl10.bin -i haribote.img ::
-	mcopy -i haribote.img haribote.sys ipl10.nas make.bat hello.hrb hello2.hrb a.hrb hello3.hrb crack1.hrb crack2.hrb crack3.hrb crack4.hrb crack5.hrb crack6.hrb ::
+	mcopy -i haribote.img $(IMG_COPY) ::
 
 # 一般規則
 

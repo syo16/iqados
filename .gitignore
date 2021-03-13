@@ -3,6 +3,8 @@
 *.o
 *.sys
 *.hrb
+*.map
+*.a
 
 hankaku.c
 convHankakuTxt

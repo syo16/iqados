@@ -1,91 +1,102 @@
-OBJS_BOOTPACK = bootpack.o graphic.o dsctbl.o naskfunc.o hankaku.o mysprintf.o int.o fifo.o keyboard.o mouse.o memory.o sheet.o timer.o mtask.o myfunction.o window.o console.o file.o
-
-#OBJS_API = a_nask.o
-OBJS_API = api001.o api002.o api003.o api004.o api005.o api006.o api007.o api008.o api009.o api010.o api011.o api012.o api013.o api014.o api015.o api016.o api017.o api018.o api019.o api020.o
-
-IMG_REQUISITE = ipl10.bin haribote.sys a.hrb hello3.hrb hello4.hrb hello5.hrb winhelo.hrb winhelo2.hrb winhelo3.hrb star1.hrb stars.hrb stars2.hrb lines.hrb walk.hrb noodle.hrb beepdown.hrb color.hrb color2.hrb
-IMG_COPY = haribote.sys ipl10.nas make.bat a.hrb hello3.hrb hello4.hrb hello5.hrb winhelo.hrb winhelo2.hrb winhelo3.hrb star1.hrb stars.hrb stars2.hrb lines.hrb walk.hrb noodle.hrb beepdown.hrb color.hrb color2.hrb
+APPS = a/a.hrb hello3/hello3.hrb hello4/hello4.hrb hello5/hello5.hrb winhelo/winhelo.hrb winhelo2/winhelo2.hrb winhelo3/winhelo3.hrb star1/star1.hrb stars/stars.hrb stars2/stars2.hrb lines/lines.hrb walk/walk.hrb noodle/noodle.hrb beepdown/beepdown.hrb color/color.hrb color2/color2.hrb
 
 MAKE     = make -r
 DEL      = rm -f
 
-CC = i386-elf-gcc
-CFLAGS = -m32 -fno-builtin
-COPTION = -march=i486 -nostdlib
-COSLD = -T hrb.ld
-CAPPLD = -T app.ld
-CAPPLD2 = -T app2.ld
-CC_WITH_OPTION = i386-elf-gcc -m32 -march=i486 -nostdlib
-
 # デフォルト動作
 
 default :
-	$(MAKE) img
+	$(MAKE) haribote.img
 
-# ファイル生成規則
-ipl10.bin : ipl10.nas Makefile
-	nasm $< -o $@ -l ipl10.lst
-
-asmhead.bin : asmhead.nas Makefile
-	nasm $< -o $@ -l asmhead.lst
-
-# convHankakuTxt.c は標準ライブラリが必要なので、macOS標準のgccを使う
-convHankakuTxt : convHankakuTxt.c
-	gcc $< -o $@
-
-hankaku.c : hankaku.txt convHankakuTxt
-	./convHankakuTxt
-
-# https://gcc.gnu.org/onlinedocs/gcc/Link-Options.html
-bootpack.hrb : $(OBJS_BOOTPACK) hrb.ld Makefile   # 自作のmysprintf.c の sprintfでは警告が出るので、-fno-builtinオプションを追加
-	$(CC) $(CFLAGS) $(COPTION) -T hrb.ld -Xlinker -Map=bootpack.map -g $(OBJS_BOOTPACK) -o $@
-
-haribote.sys : asmhead.bin bootpack.hrb Makefile
-	cat asmhead.bin bootpack.hrb > haribote.sys
-
-libapi.a : $(OBJS_API)
-	i386-elf-ar rcs $@ $^
-
-hello5.hrb : hello5.o app.ld
-	$(CC_WITH_OPTION) $(CAPPLD) -o $@ $<
-
-noodle.hrb : noodle.o mysprintf.o libapi.a app2.ld 
-	$(CC_WITH_OPTION) $(CAPPLD2) -o $@ $< mysprintf.o libapi.a
-
-haribote.img : $(IMG_REQUISITE) Makefile
-	mformat -f 1440 -C -B ipl10.bin -i haribote.img ::
-	mcopy -i haribote.img $(IMG_COPY) ::
-
-# 一般規則
-
-%.o : %.c
-	$(CC) $(CFLAGS) -c $*.c -o $*.o
-
-%.o : %.nas
-	nasm -g -f elf $*.nas -o $*.o -l $*.lst
-
-%.hrb : %.o libapi.a app.ld
-	$(CC_WITH_OPTION) $(CAPPLD) -o $@ $< libapi.a
+haribote.img : haribote/ipl10.bin haribote/haribote.sys $(APPS) Makefile
+	mformat -f 1440 -C -B haribote/ipl10.bin -i haribote.img ::
+	mcopy -i haribote.img haribote/haribote.sys haribote/ipl10.nas make.bat $(APPS) ::
 
 # コマンド
 
-img :
-	$(MAKE) haribote.img
-
 run :
-	$(MAKE) img
+	$(MAKE) haribote.img
 	qemu-system-i386 -drive file=haribote.img,format=raw,if=floppy -boot a
 
+full :
+	$(MAKE) -C haribote
+	$(MAKE) -C apilib
+	$(MAKE) -C a
+	$(MAKE) -C hello3
+	$(MAKE) -C hello4
+	$(MAKE) -C hello5
+	$(MAKE) -C winhelo
+	$(MAKE) -C winhelo2
+	$(MAKE) -C winhelo3
+	$(MAKE) -C star1
+	$(MAKE) -C stars
+	$(MAKE) -C stars2
+	$(MAKE) -C lines
+	$(MAKE) -C walk
+	$(MAKE) -C noodle
+	$(MAKE) -C beepdown
+	$(MAKE) -C color
+	$(MAKE) -C color2
+	$(MAKE) haribote.img
+
+run_full :
+	$(MAKE) full
+	qemu-system-i386 -drive file=haribote.img,format=raw,if=floppy -boot a
+
+# install_full :
+
+run_os :
+	$(MAKE) -C haribote
+	$(MAKE) run
+
 clean :
-	-$(DEL) *.bin
-	-$(DEL) *.lst
-	-$(DEL) *.o
-	-$(DEL) *.sys
-	-$(DEL) *.hrb
-	-$(DEL) *.map
-	-$(DEL) hankaku.c
-	-$(DEL) convHankakuTxt
 
 src_only :
 	$(MAKE) clean
+	-$(DEL) haribote.img
+
+clean_full :
+	$(MAKE) -C haribote clean
+	$(MAKE) -C apilib clean
+	$(MAKE) -C a clean
+	$(MAKE) -C hello3 clean
+	$(MAKE) -C hello4 clean
+	$(MAKE) -C hello5 clean
+	$(MAKE) -C winhelo clean
+	$(MAKE) -C winhelo2 clean
+	$(MAKE) -C winhelo3 clean
+	$(MAKE) -C star1 clean
+	$(MAKE) -C stars clean
+	$(MAKE) -C stars2 clean
+	$(MAKE) -C lines clean
+	$(MAKE) -C walk	 clean
+	$(MAKE) -C noodle clean
+	$(MAKE) -C beepdown clean
+	$(MAKE) -C color clean
+	$(MAKE) -C color2 clean
+
+src_only_full :
+	$(MAKE) -C haribote src_only
+	$(MAKE) -C apilib src_only
+	$(MAKE) -C a src_only
+	$(MAKE) -C hello3 src_only
+	$(MAKE) -C hello4 src_only
+	$(MAKE) -C hello5 src_only
+	$(MAKE) -C winhelo src_only
+	$(MAKE) -C winhelo2 src_only
+	$(MAKE) -C winhelo3 src_only
+	$(MAKE) -C star1 src_only
+	$(MAKE) -C stars src_only
+	$(MAKE) -C stars2 src_only
+	$(MAKE) -C lines src_only
+	$(MAKE) -C walk	 src_only
+	$(MAKE) -C noodle src_only
+	$(MAKE) -C beepdown src_only
+	$(MAKE) -C color src_only
+	$(MAKE) -C color2 src_only
+	-$(DEL) haribote.img
+
+refresh :
+	$(MAKE) full
+	$(MAKE) clean_full
 	-$(DEL) haribote.img

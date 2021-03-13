@@ -1,4 +1,4 @@
-#include "apilib.h"
+#include "../apilib.h"
 
 void sprintf(char *str, char *fmt, ...);
 void HariMain(void) {

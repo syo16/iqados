@@ -69,28 +69,28 @@ LOAD file.o
 
 .text           0x0000000000000030     0x635a
  *(.text)
- .text          0x0000000000000030      0xfa3 bootpack.o
+ .text          0x0000000000000030      0xfa7 bootpack.o
                 0x0000000000000030                HariMain
-                0x0000000000000cf0                keywin_off
-                0x0000000000000d2e                keywin_on
-                0x0000000000000d6c                open_constask
-                0x0000000000000e6b                open_console
-                0x0000000000000f26                close_constask
-                0x0000000000000f85                close_console
- .text          0x0000000000000fd3      0x6f7 graphic.o
-                0x0000000000000fd3                boxfill8
-                0x0000000000001022                init_palette
-                0x0000000000001189                set_palette
-                0x000000000000122f                init_screen
-                0x000000000000144a                putfont8
-                0x0000000000001542                putfonts8_asc
-                0x000000000000158e                init_mouse_cursor8
-                0x000000000000165e                putblock8_8
- .text          0x00000000000016ca      0x261 dsctbl.o
-                0x00000000000016ca                init_gdtidt
-                0x0000000000001875                set_segmdesc
-                0x00000000000018ec                set_gatedesc
- *fill*         0x000000000000192b        0x5 
+                0x0000000000000cf4                keywin_off
+                0x0000000000000d32                keywin_on
+                0x0000000000000d70                open_constask
+                0x0000000000000e6f                open_console
+                0x0000000000000f2a                close_constask
+                0x0000000000000f89                close_console
+ .text          0x0000000000000fd7      0x6f7 graphic.o
+                0x0000000000000fd7                boxfill8
+                0x0000000000001026                init_palette
+                0x000000000000118d                set_palette
+                0x0000000000001233                init_screen
+                0x000000000000144e                putfont8
+                0x0000000000001546                putfonts8_asc
+                0x0000000000001592                init_mouse_cursor8
+                0x0000000000001662                putblock8_8
+ .text          0x00000000000016ce      0x261 dsctbl.o
+                0x00000000000016ce                init_gdtidt
+                0x0000000000001879                set_segmdesc
+                0x00000000000018f0                set_gatedesc
+ *fill*         0x000000000000192f        0x1 
  .text          0x0000000000001930      0x1c3 naskfunc.o
                 0x0000000000001930                io_hlt
                 0x0000000000001932                io_cli

@@ -1,7 +1,10 @@
 OBJS_BOOTPACK = bootpack.o graphic.o dsctbl.o naskfunc.o hankaku.o mysprintf.o int.o fifo.o keyboard.o mouse.o memory.o sheet.o timer.o mtask.o myfunction.o window.o console.o file.o
 
-IMG_REQUISITE = ipl10.bin haribote.sys hello.hrb hello2.hrb a.hrb hello3.hrb hello4.hrb hello5.hrb winhelo.hrb winhelo2.hrb winhelo3.hrb star1.hrb stars.hrb stars2.hrb lines.hrb walk.hrb noodle.hrb beepdown.hrb color.hrb color2.hrb crack7.hrb bug1.hrb bug2.hrb bug3.hrb
-IMG_COPY = haribote.sys ipl10.nas make.bat hello.hrb hello2.hrb a.hrb hello3.hrb hello4.hrb hello5.hrb winhelo.hrb winhelo2.hrb winhelo3.hrb star1.hrb stars.hrb stars2.hrb lines.hrb walk.hrb noodle.hrb beepdown.hrb color.hrb color2.hrb crack7.hrb bug1.hrb bug2.hrb bug3.hrb
+#OBJS_API = a_nask.o
+OBJS_API = api001.o api002.o api003.o api004.o api005.o api006.o api007.o api008.o api009.o api010.o api011.o api012.o api013.o api014.o api015.o api016.o api017.o api018.o api019.o api020.o
+
+IMG_REQUISITE = ipl10.bin haribote.sys a.hrb hello3.hrb hello4.hrb hello5.hrb winhelo.hrb winhelo2.hrb winhelo3.hrb star1.hrb stars.hrb stars2.hrb lines.hrb walk.hrb noodle.hrb beepdown.hrb color.hrb color2.hrb
+IMG_COPY = haribote.sys ipl10.nas make.bat a.hrb hello3.hrb hello4.hrb hello5.hrb winhelo.hrb winhelo2.hrb winhelo3.hrb star1.hrb stars.hrb stars2.hrb lines.hrb walk.hrb noodle.hrb beepdown.hrb color.hrb color2.hrb
 
 MAKE     = make -r
 DEL      = rm -f
@@ -12,6 +15,7 @@ COPTION = -march=i486 -nostdlib
 COSLD = -T hrb.ld
 CAPPLD = -T app.ld
 CAPPLD2 = -T app2.ld
+CC_WITH_OPTION = i386-elf-gcc -m32 -march=i486 -nostdlib
 
 # デフォルト動作
 
@@ -19,7 +23,12 @@ default :
 	$(MAKE) img
 
 # ファイル生成規則
-#
+ipl10.bin : ipl10.nas Makefile
+	nasm $< -o $@ -l ipl10.lst
+
+asmhead.bin : asmhead.nas Makefile
+	nasm $< -o $@ -l asmhead.lst
+
 # convHankakuTxt.c は標準ライブラリが必要なので、macOS標準のgccを使う
 convHankakuTxt : convHankakuTxt.c
 	gcc $< -o $@
@@ -27,88 +36,21 @@ convHankakuTxt : convHankakuTxt.c
 hankaku.c : hankaku.txt convHankakuTxt
 	./convHankakuTxt
 
-
-ipl10.bin : ipl10.nas Makefile
-	nasm $< -o $@ -l ipl10.lst
-
-asmhead.bin : asmhead.nas Makefile
-	nasm $< -o $@ -l asmhead.lst
-
-naskfunc.o : naskfunc.nas Makefile          # naskfunc.nasのバイナリファイル作成
-	nasm -g -f elf $< -o $@ -l naskfunc.lst
-
 # https://gcc.gnu.org/onlinedocs/gcc/Link-Options.html
 bootpack.hrb : $(OBJS_BOOTPACK) hrb.ld Makefile   # 自作のmysprintf.c の sprintfでは警告が出るので、-fno-builtinオプションを追加
 	$(CC) $(CFLAGS) $(COPTION) -T hrb.ld -Xlinker -Map=bootpack.map -g $(OBJS_BOOTPACK) -o $@
 
-hello.hrb : hello.nas Makefile
-	nasm $< -o $@ -l hello.lst
-
-hello2.hrb : hello2.nas Makefile
-	nasm $< -o $@ -l hello2.lst
-
-a.hrb : a.o a_nask.o app.ld Makefile
-	$(CC) $(CFLAGS) $(COPTION) $(CAPPLD) -g a.o a_nask.o -o $@
-
-hello3.hrb : hello3.o a_nask.o app.ld 
-	$(CC) $(CFLAGS) $(COPTION) $(CAPPLD) -g hello3.o a_nask.o -o $@
-
-hello4.hrb : hello4.o a_nask.o app.ld 
-	$(CC) $(CFLAGS) $(COPTION) $(CAPPLD) -g hello4.o a_nask.o -o $@
-
-hello5.hrb : hello5.o app.ld
-	$(CC) $(CFLAGS) $(COPTION) $(CAPPLD) -g hello5.o -o $@
-
-winhelo.hrb : winhelo.o a_nask.o app.ld 
-	$(CC) $(CFLAGS) $(COPTION) $(CAPPLD) -g winhelo.o a_nask.o -o $@
-
-winhelo2.hrb : winhelo2.o a_nask.o app.ld 
-	$(CC) $(CFLAGS) $(COPTION) $(CAPPLD) -g winhelo2.o a_nask.o -o $@
-
-winhelo3.hrb : winhelo3.o a_nask.o app.ld 
-	$(CC) $(CFLAGS) $(COPTION) $(CAPPLD) -g winhelo3.o a_nask.o -o $@
-
-star1.hrb : star1.o a_nask.o app.ld 
-	$(CC) $(CFLAGS) $(COPTION) $(CAPPLD) -g star1.o a_nask.o -o $@
-
-stars.hrb : stars.o a_nask.o app.ld 
-	$(CC) $(CFLAGS) $(COPTION) $(CAPPLD) -g stars.o a_nask.o -o $@
-
-stars2.hrb : stars2.o a_nask.o app.ld 
-	$(CC) $(CFLAGS) $(COPTION) $(CAPPLD) -g stars2.o a_nask.o -o $@
-
-lines.hrb : lines.o a_nask.o app.ld 
-	$(CC) $(CFLAGS) $(COPTION) $(CAPPLD) -g lines.o a_nask.o -o $@
-
-walk.hrb : walk.o a_nask.o app.ld 
-	$(CC) $(CFLAGS) $(COPTION) $(CAPPLD) -g walk.o a_nask.o -o $@
-
-noodle.hrb : noodle.o a_nask.o mysprintf.o app.ld 
-	$(CC) $(CFLAGS) $(COPTION) $(CAPPLD2) -g noodle.o a_nask.o mysprintf.o -o $@
-
-beepdown.hrb : beepdown.o a_nask.o app.ld 
-	$(CC) $(CFLAGS) $(COPTION) $(CAPPLD) -g beepdown.o a_nask.o -o $@
-
-color.hrb : color.o a_nask.o app.ld 
-	$(CC) $(CFLAGS) $(COPTION) $(CAPPLD) -g color.o a_nask.o -o $@
-
-color2.hrb : color2.o a_nask.o app.ld 
-	$(CC) $(CFLAGS) $(COPTION) $(CAPPLD) -g color2.o a_nask.o -o $@
-
-crack7.hrb : crack7.o app.ld
-	$(CC) $(CFLAGS) $(COPTION) $(CAPPLD) -g crack7.o -o $@
-
-bug1.hrb : bug1.o a_nask.o app.ld 
-	$(CC) $(CFLAGS) $(COPTION) $(CAPPLD) -g bug1.o a_nask.o -o $@
-
-bug2.hrb : bug2.o a_nask.o app.ld 
-	$(CC) $(CFLAGS) $(COPTION) $(CAPPLD) -g bug2.o a_nask.o -o $@
-
-bug3.hrb : bug3.o a_nask.o app.ld 
-	$(CC) $(CFLAGS) $(COPTION) $(CAPPLD) -g bug3.o a_nask.o -o $@
-
 haribote.sys : asmhead.bin bootpack.hrb Makefile
 	cat asmhead.bin bootpack.hrb > haribote.sys
+
+libapi.a : $(OBJS_API)
+	i386-elf-ar rcs $@ $^
+
+hello5.hrb : hello5.o app.ld
+	$(CC_WITH_OPTION) $(CAPPLD) -o $@ $<
+
+noodle.hrb : noodle.o mysprintf.o libapi.a app2.ld 
+	$(CC_WITH_OPTION) $(CAPPLD2) -o $@ $< mysprintf.o libapi.a
 
 haribote.img : $(IMG_REQUISITE) Makefile
 	mformat -f 1440 -C -B ipl10.bin -i haribote.img ::
@@ -121,6 +63,9 @@ haribote.img : $(IMG_REQUISITE) Makefile
 
 %.o : %.nas
 	nasm -g -f elf $*.nas -o $*.o -l $*.lst
+
+%.hrb : %.o libapi.a app.ld
+	$(CC_WITH_OPTION) $(CAPPLD) -o $@ $< libapi.a
 
 # コマンド
 

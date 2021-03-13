@@ -340,3 +340,4 @@ struct FILEINFO {
 
 void keywin_off(struct SHEET *key_win);
 void keywin_on(struct SHEET *key_win);
+struct SHEET *open_console(struct SHTCTL *shtctl, unsigned int memtotal); 

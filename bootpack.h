@@ -247,6 +247,7 @@ int timer_cancel(struct TIMER *timer);
 void timer_cancelall(struct FIFO32 *fifo);
 
 /* mtask.c */
+extern struct TASKCTL *taskctl;
 extern struct TIMER *task_timer;
 struct TASK *task_init(struct MEMMAN *memman);
 struct TASK *task_alloc(void);
@@ -283,6 +284,7 @@ void cmd_dir(struct CONSOLE *cons);
 void cmd_type(struct CONSOLE *cons, int *fat, char *cmdline);
 void cmd_exit(struct CONSOLE *cons, int *fat); 
 void cmd_start(struct CONSOLE *cons, char *cmdline, int memtotal); 
+void cmd_ncst(struct CONSOLE *cons, char *cmdline, int memtotal); 
 int cmd_app(struct CONSOLE *cons, int *fat, char *cmdline); 
 void cons_putstr0(struct CONSOLE *cons, char *s); 
 void cons_putstr1(struct CONSOLE *cons, char *s, int l); 
@@ -342,6 +344,7 @@ struct FILEINFO {
 
 void keywin_off(struct SHEET *key_win);
 void keywin_on(struct SHEET *key_win);
+struct TASK *open_constask(struct SHEET *sht, unsigned int memtotal);
 struct SHEET *open_console(struct SHTCTL *shtctl, unsigned int memtotal); 
 void close_constask(struct TASK *task); 
 void close_console(struct SHEET *sht); 

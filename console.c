@@ -49,6 +49,9 @@ void console_task(struct SHEET *sheet, unsigned int memtotal) {
                 boxfill8(sheet->buf, sheet->bxsize, COL8_000000, cons.cur_x, cons.cur_y, cons.cur_x + 7, cons.cur_y + 15);
                 cons.cur_c = -1;
             }
+            if (i == 4) { /* コンソールのｘボタンをクリック */
+                cmd_exit(&cons, fat);
+            }
             if (256 <= i && i <= 511) { /* キーボードデータ(タスクA経由) */
                 if (i == 8 + 256) {
                     /* バックスペース */
@@ -149,6 +152,8 @@ void cons_runcmd(char *cmdline, struct CONSOLE *cons, int *fat, unsigned int mem
         cmd_dir(cons);
     } else if (strncmp(cmdline, "type ", 5) == 0) {
         cmd_type(cons, fat, cmdline);
+    } else if (strcmp(cmdline, "exit") == 0) {
+        cmd_exit(cons, fat); 
     } else if (cmdline[0] != 0) {
         if (cmd_app(cons, fat, cmdline) == 0) {
             /* コマンドでなく、アプリでもなく,更に空行でもない */
@@ -223,6 +228,21 @@ void cmd_type(struct CONSOLE *cons, int *fat, char *cmdline) {
     }
     cons_newline(cons);
     return;
+}
+
+void cmd_exit(struct CONSOLE *cons, int *fat) {
+    struct MEMMAN *memman = (struct MEMMAN *) MEMMAN_ADDR;
+    struct TASK *task = task_now();
+    struct SHTCTL *shtctl = (struct SHTCTL *) *((int *) 0x0fe4);
+    struct FIFO32 *fifo = (struct FIFO32 *) *((int *) 0x0fec);
+    timer_cancel(cons->timer);
+    memman_free_4k(memman, (int) fat, 4 * 2880);
+    io_cli();
+    fifo32_put(fifo, cons->sht - shtctl->sheets0 + 768); /* 768~1023 */
+    io_sti();
+    for (;;) {
+        task_sleep(task);
+    }
 }
 
 int cmd_app(struct CONSOLE *cons, int *fat, char *cmdline) {

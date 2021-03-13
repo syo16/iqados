@@ -1,7 +1,7 @@
 OBJS_BOOTPACK = bootpack.o graphic.o dsctbl.o naskfunc.o hankaku.o mysprintf.o int.o fifo.o keyboard.o mouse.o memory.o sheet.o timer.o mtask.o myfunction.o window.o console.o file.o
 
-IMG_REQUISITE = ipl10.bin haribote.sys hello.hrb hello2.hrb a.hrb hello3.hrb hello4.hrb hello5.hrb winhelo.hrb winhelo2.hrb winhelo3.hrb star1.hrb stars.hrb stars2.hrb lines.hrb walk.hrb noodle.hrb beepdown.hrb color.hrb color2.hrb bug1.hrb bug2.hrb bug3.hrb
-IMG_COPY = haribote.sys ipl10.nas make.bat hello.hrb hello2.hrb a.hrb hello3.hrb hello4.hrb hello5.hrb winhelo.hrb winhelo2.hrb winhelo3.hrb star1.hrb stars.hrb stars2.hrb lines.hrb walk.hrb noodle.hrb beepdown.hrb color.hrb color2.hrb bug1.hrb bug2.hrb bug3.hrb
+IMG_REQUISITE = ipl10.bin haribote.sys hello.hrb hello2.hrb a.hrb hello3.hrb hello4.hrb hello5.hrb winhelo.hrb winhelo2.hrb winhelo3.hrb star1.hrb stars.hrb stars2.hrb lines.hrb walk.hrb noodle.hrb beepdown.hrb color.hrb color2.hrb crack7.hrb bug1.hrb bug2.hrb bug3.hrb
+IMG_COPY = haribote.sys ipl10.nas make.bat hello.hrb hello2.hrb a.hrb hello3.hrb hello4.hrb hello5.hrb winhelo.hrb winhelo2.hrb winhelo3.hrb star1.hrb stars.hrb stars2.hrb lines.hrb walk.hrb noodle.hrb beepdown.hrb color.hrb color2.hrb crack7.hrb bug1.hrb bug2.hrb bug3.hrb
 
 MAKE     = make -r
 DEL      = rm -f
@@ -94,6 +94,9 @@ color.hrb : color.o a_nask.o app.ld
 
 color2.hrb : color2.o a_nask.o app.ld 
 	$(CC) $(CFLAGS) $(COPTION) $(CAPPLD) -g color2.o a_nask.o -o $@
+
+crack7.hrb : crack7.o app.ld
+	$(CC) $(CFLAGS) $(COPTION) $(CAPPLD) -g crack7.o -o $@
 
 bug1.hrb : bug1.o a_nask.o app.ld 
 	$(CC) $(CFLAGS) $(COPTION) $(CAPPLD) -g bug1.o a_nask.o -o $@

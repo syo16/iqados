@@ -10,7 +10,7 @@ void HariMain(void)
     struct FIFO32 fifo, keycmd;
     char s[40];
     int fifobuf[128], keycmd_buf[32], *cons_fifo[2];
-	int mx, my, i;
+	int mx, my, i, new_mx = -1, new_my = 0, new_wx = 0x7fffffff, new_wy = 0;
     unsigned int memtotal;
     struct MOUSE_DEC mdec;
     struct MEMMAN *memman = (struct MEMMAN *)MEMMAN_ADDR;
@@ -38,7 +38,7 @@ void HariMain(void)
 		0, 0, 0, '_', 0, 0, 0, 0, 0, 0, 0, 0, 0, '|', 0, 0
 	};
     int key_shift = 0, key_leds = (binfo->leds >> 4) & 7, keycmd_wait = -1;
-    int j, x, y, mmx = -1, mmy = -1;
+    int j, x, y, mmx = -1, mmy = -1, mmx2 = 0;
     struct SHEET *sht = 0, *key_win;
 
     init_gdtidt();
@@ -126,8 +126,19 @@ void HariMain(void)
         }
         io_cli();
         if (fifo32_status(&fifo) == 0) {
-            task_sleep(task_a);
-            io_sti();
+            /* FIFOが空っぽになったので、保留している描画があれば実行する */
+            if (new_mx >= 0) {
+                io_sti();
+                sheet_slide(sht_mouse, new_mx, new_my);
+                new_mx = -1;
+            } else if (new_wx != 0x7fffffff) {
+                io_sti();
+                sheet_slide(sht, new_wx, new_wy);
+                new_wx = 0x7fffffff;
+            } else {
+                task_sleep(task_a);
+                io_sti();
+            }
         } else {
             i = fifo32_get(&fifo);
             io_sti();
@@ -220,17 +231,6 @@ void HariMain(void)
             } else if (512 <= i && i <= 767) { /* マウスデータ */
                 if (mouse_decode(&mdec, i - 512) != 0) {
                     /* データが3バイト揃ったので表示 */
-                    //sprintf(s, "[lcr %d %d]",mdec.x, mdec.y);
-                    //if ((mdec.btn & 0x01) != 0) {
-                        //s[1] = 'L';
-                    //}
-                    //if ((mdec.btn & 0x02) != 0) {
-                        //s[3] = 'R';
-                    //}
-                    //if ((mdec.btn & 0x04) != 0) {
-                        //s[2] = 'C';
-                    //}
-                    //putfonts8_asc_sht(sht_back, 32, 16, COL8_FFFFFF, COL8_008484, s, 15);
                     /* マウスカーソルの移動 */
                     mx += mdec.x;
                     my += mdec.y;
@@ -246,9 +246,10 @@ void HariMain(void)
                     if (my > binfo->scrny - 1) {
                         my = binfo->scrny - 1;
                     }
-                    //sprintf(s, "(%d, %d)", mx, my);
-                    //putfonts8_asc_sht(sht_back, 0, 0, COL8_FFFFFF, COL8_008484, s, 10);
-                    sheet_slide(sht_mouse, mx, my);
+
+                    new_mx = mx;
+                    new_my = my;
+
                     if ((mdec.btn & 0x01) != 0) {
                         /* 左ボタンを押している */
                         if (mmx < 0) {
@@ -269,6 +270,8 @@ void HariMain(void)
                                         if (3 <= x && x < sht->bxsize - 3 && 3 <= y && y < 21) {
                                             mmx = mx; /* ウィンドウ移動モードへ */
                                             mmy = my;
+                                            mmx2 = sht->vx0;
+                                            new_wy = sht->vy0;
                                         }
                                         if (sht->bxsize - 21 <= x && x < sht->bxsize - 5 && 5 <= y && y < 19) {
                                             /* xボタンクリック */
@@ -289,13 +292,17 @@ void HariMain(void)
                             /* ウィンドウ移動モードの場合 */
                             x = mx - mmx; /* マウスの移動量を計算 */
                             y = my - mmy;
-                            sheet_slide(sht, sht->vx0 + x, sht->vy0 + y);
-                            mmx = mx; /* 移動後の座標に更新 */
-                            mmy = my;
+                            new_wx = (mmx2 + x + 2) & ~3;
+                            new_wy = new_wy + y;
+                            mmy = my; /* 移動後の座標に更新 */
                         }
                     } else {
                         /* 左ボタンを押していない */
                         mmx = -1; /* 通常モードへ */
+                        if (new_wx != 0x7fffffff) {
+                            sheet_slide(sht, new_wx, new_wy); /* 一度確定させる */
+                            new_wx = 0x7fffffff;
+                        }
                     }
                 }
             }

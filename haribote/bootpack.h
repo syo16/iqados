@@ -1,9 +1,5 @@
-/* mysprint.c */
-void sprintf(char *str, char *fmt, ...);     // mysprintf.c で、独自の sprintf を作成したので行追加
-
-/* myfunction.c */
-int strcmp(char *s1, char *s2); 
-int strncmp(char *s1, char *s2, int n);
+#include "../include/stdio.h"
+#include "../include/string.h"
 
 /* asmhead.nas */
 struct BOOTINFO { /* 0x0ff0 = 0x0fff */

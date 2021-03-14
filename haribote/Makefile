@@ -1,4 +1,6 @@
-OBJS_BOOTPACK = bootpack.o graphic.o dsctbl.o naskfunc.o hankaku.o mysprintf.o int.o fifo.o keyboard.o mouse.o memory.o sheet.o timer.o mtask.o myfunction.o window.o console.o file.o
+LIBPATH = ../lib/
+
+OBJS_BOOTPACK = bootpack.o graphic.o dsctbl.o naskfunc.o hankaku.o mysprintf.o int.o fifo.o keyboard.o mouse.o memory.o sheet.o timer.o mtask.o myfunction.o window.o console.o file.o $(LIBPATH)libstdio.a $(LIBPATH)libstring.a
 
 MAKE     = make -r
 DEL      = rm -f

@@ -3,6 +3,67 @@
 struct TASKCTL *taskctl;
 struct TIMER *task_timer;
 
+struct TASK *task_now(void) {
+    struct TASKLEVEL *tl = &taskctl->level[taskctl->now_lv];
+    return tl->tasks[tl->now];
+}
+
+void task_add(struct TASK *task) {
+    struct TASKLEVEL *tl = &taskctl->level[task->level];
+    tl->tasks[tl->running] = task;
+    tl->running++;
+    task->flags = 2; /* 動作中 */
+    return;
+}
+
+void task_remove(struct TASK *task) {
+    int i;
+    struct TASKLEVEL *tl = &taskctl->level[task->level];
+
+    /* taskがどこにいるか探す */
+    for (i = 0; i < tl->running; i++) {
+        if (tl->tasks[i] == task) {
+            /* ここにいた */
+            break;
+        }
+    }
+
+    tl->running--;
+    if (i < tl->now) {
+        tl->now--; /* ずれるのでこれも合わせておく */
+    }
+    if (tl->now >= tl->running) {
+        /* nowがおかしな値になっていたら、修正する */
+        tl->now = 0;
+    }
+    task->flags = 1; /* スリープ中 */
+
+    /* ずらし */
+    for (; i < tl->running; i++) {
+        tl->tasks[i] = tl->tasks[i + 1];
+    }
+    return;
+}
+
+void task_switchsub(void) {
+    int i;
+    /* 一番上のレベルを探す */
+    for (i = 0; i < MAX_TASKLEVELS; i++) {
+        if (taskctl->level[i].running > 0) {
+            break; /* 見つかった */
+        }
+    }
+    taskctl->now_lv = i;
+    taskctl->lv_change = 0;
+    return;
+}
+
+void task_idle(void) {
+    for (;;) {
+        io_hlt();
+    }
+}
+
 struct TASK *task_init(struct MEMMAN *memman) {
     int i;
     struct TASK *task, *idle;
@@ -125,63 +186,3 @@ void task_sleep(struct TASK *task) {
     return;
 }
 
-struct TASK *task_now(void) {
-    struct TASKLEVEL *tl = &taskctl->level[taskctl->now_lv];
-    return tl->tasks[tl->now];
-}
-
-void task_add(struct TASK *task) {
-    struct TASKLEVEL *tl = &taskctl->level[task->level];
-    tl->tasks[tl->running] = task;
-    tl->running++;
-    task->flags = 2; /* 動作中 */
-    return;
-}
-
-void task_remove(struct TASK *task) {
-    int i;
-    struct TASKLEVEL *tl = &taskctl->level[task->level];
-
-    /* taskがどこにいるか探す */
-    for (i = 0; i < tl->running; i++) {
-        if (tl->tasks[i] == task) {
-            /* ここにいた */
-            break;
-        }
-    }
-
-    tl->running--;
-    if (i < tl->now) {
-        tl->now--; /* ずれるのでこれも合わせておく */
-    }
-    if (tl->now >= tl->running) {
-        /* nowがおかしな値になっていたら、修正する */
-        tl->now = 0;
-    }
-    task->flags = 1; /* スリープ中 */
-
-    /* ずらし */
-    for (; i < tl->running; i++) {
-        tl->tasks[i] = tl->tasks[i + 1];
-    }
-    return;
-}
-
-void task_switchsub(void) {
-    int i;
-    /* 一番上のレベルを探す */
-    for (i = 0; i < MAX_TASKLEVELS; i++) {
-        if (taskctl->level[i].running > 0) {
-            break; /* 見つかった */
-        }
-    }
-    taskctl->now_lv = i;
-    taskctl->lv_change = 0;
-    return;
-}
-
-void task_idle(void) {
-    for (;;) {
-        io_hlt();
-    }
-}

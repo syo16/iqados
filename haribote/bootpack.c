@@ -9,7 +9,7 @@ void HariMain(void)
     struct SHTCTL *shtctl;
     struct FIFO32 fifo, keycmd;
     char s[40];
-    int fifobuf[128], keycmd_buf[32], *cons_fifo[2];
+    int fifobuf[128], keycmd_buf[32];
 	int mx, my, i, new_mx = -1, new_my = 0, new_wx = 0x7fffffff, new_wy = 0;
     unsigned int memtotal;
     struct MOUSE_DEC mdec;
@@ -99,9 +99,9 @@ void HariMain(void)
     *((int *) 0x0fec) = (int) &fifo;
 
     /* nihongo.fntの読み込み */
-    nihongo = (unsigned char *) memman_alloc_4k(memman, 16 * 256 + 23 * 94 * 47);
     fat = (int *) memman_alloc_4k(memman, 4 * 2880);
     file_readfat(fat, (unsigned char *) (ADR_DISKIMG + 0x000200));
+
     finfo = file_search("nihongo.fnt", (struct FILEINFO *) (ADR_DISKIMG + 0x002600), 224);
     if (finfo != 0) {
         i = finfo->size;

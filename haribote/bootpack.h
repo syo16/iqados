@@ -252,10 +252,6 @@ void task_run (struct TASK *task, int level, int priority);
 void task_switch(void); 
 void task_sleep(struct TASK *task);
 struct TASK *task_now(void); 
-void task_add(struct TASK *task); 
-void task_remove(struct TASK *task);
-void task_switchsub(void);
-void task_idle(void);
 
 /* window.c */
 void make_window8(unsigned char *buf, int xsize, int ysize, char *title, char act);

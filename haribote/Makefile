@@ -12,12 +12,12 @@ COPTION = -march=i486 -nostdlib
 # デフォルト動作
 
 default :
-	$(MAKE) ipl10.bin
+	$(MAKE) ipl20.bin
 	$(MAKE)	haribote.sys 
 
 # ファイル生成規則
-ipl10.bin : ipl10.nas Makefile
-	nasm $< -o $@ -l ipl10.lst
+ipl20.bin : ipl20.nas Makefile
+	nasm $< -o $@ -l ipl20.lst
 
 asmhead.bin : asmhead.nas Makefile
 	nasm $< -o $@ -l asmhead.lst

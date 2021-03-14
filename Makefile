@@ -8,9 +8,9 @@ DEL      = rm -f
 default :
 	$(MAKE) haribote.img
 
-haribote.img : haribote/ipl10.bin haribote/haribote.sys $(APPS) Makefile
-	mformat -f 1440 -C -B haribote/ipl10.bin -i haribote.img ::
-	mcopy -i haribote.img haribote/haribote.sys haribote/ipl10.nas make.bat $(APPS) nihongo/nihongo.fnt ::
+haribote.img : haribote/ipl20.bin haribote/haribote.sys $(APPS) Makefile
+	mformat -f 1440 -C -B haribote/ipl20.bin -i haribote.img ::
+	mcopy -i haribote.img haribote/haribote.sys haribote/ipl20.nas make.bat $(APPS) nihongo/nihongo.fnt ::
 
 # コマンド
 

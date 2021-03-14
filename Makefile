@@ -10,7 +10,7 @@ default :
 
 haribote.img : haribote/ipl20.bin haribote/haribote.sys $(APPS) Makefile
 	mformat -f 1440 -C -B haribote/ipl20.bin -i haribote.img ::
-	mcopy -i haribote.img haribote/haribote.sys haribote/ipl20.nas make.bat $(APPS) nihongo/nihongo.fnt ::
+	mcopy -i haribote.img haribote/haribote.sys haribote/ipl20.nas make.bat $(APPS) euc.txt nihongo/nihongo.fnt ::
 
 # コマンド
 

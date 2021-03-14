@@ -60,7 +60,7 @@ void init_palette(void);
 void set_palette(int start, int end, unsigned char *rgb);
 void init_screen(char *vram, int xsize, int ysize);
 void putfont8(char *vram, int xsize, int x, int y, char c, char *font);
-void putfonts8_asc(char *vram, int xsize, int x, int y, char c, char *s);
+void putfonts8_asc(char *vram, int xsize, int x, int y, char c, unsigned char *s);
 void init_mouse_cursor8(char *mouse, char bc);
 void putblock8_8(char *vram, int vxsize, int pxsize, int pysize, int px0 ,int py0, char *buf, int bxsize);
 
@@ -281,6 +281,7 @@ void cmd_dir(struct CONSOLE *cons);
 void cmd_exit(struct CONSOLE *cons, int *fat); 
 void cmd_start(struct CONSOLE *cons, char *cmdline, int memtotal); 
 void cmd_ncst(struct CONSOLE *cons, char *cmdline, int memtotal); 
+void cmd_langmode(struct CONSOLE *cons, char *cmdline); 
 int cmd_app(struct CONSOLE *cons, int *fat, char *cmdline); 
 void cons_putstr0(struct CONSOLE *cons, char *s); 
 void cons_putstr1(struct CONSOLE *cons, char *s, int l); 
@@ -320,6 +321,7 @@ struct TASK {
     struct FILEHANDLE *fhandle;
     int *fat;
     char *cmdline;
+    char langmode;
 };
 
 struct FILEHANDLE {

@@ -7,6 +7,8 @@ void console_task(struct SHEET *sheet, unsigned int memtotal) {
     struct CONSOLE cons;
     struct FILEHANDLE fhandle[8];
     char cmdline[30];
+    unsigned char *nihongo = (char *) *((int *)0x0fe8);
+
     cons.sht = sheet;
     cons.cur_x = 8;
     cons.cur_y = 28;
@@ -14,17 +16,25 @@ void console_task(struct SHEET *sheet, unsigned int memtotal) {
     task->cons = &cons;
     task->cmdline = cmdline;
 
-    for (i = 0; i < 8; i++) {
-        fhandle[i].buf = 0; /* 未使用マーク */
-    }
-    task->fhandle = fhandle;
-    task->fat = fat;
+
     if (cons.sht != 0) {
         cons.timer = timer_alloc();
         timer_init(cons.timer, &task->fifo, 1);
         timer_settime(cons.timer, 50);
     }
     file_readfat(fat, (unsigned char *) (ADR_DISKIMG + 0x000200));
+
+    for (i = 0; i < 8; i++) {
+        fhandle[i].buf = 0; /* 未使用マーク */
+    }
+    task->fhandle = fhandle;
+    task->fat = fat;
+
+    if (nihongo[4096] != 0xff) { /* 日本語フォントファイルを読み込めたか */
+        task->langmode = 1;
+    } else {
+        task->langmode = 0;
+    }
 
     /* プロンプト表示 */
     cons_putchar(&cons, '>', 1);
@@ -178,6 +188,8 @@ void cons_runcmd(char *cmdline, struct CONSOLE *cons, int *fat, unsigned int mem
         cmd_start(cons, cmdline, memtotal);
     } else if (strncmp(cmdline, "ncst ", 5) == 0) {
         cmd_ncst(cons, cmdline, memtotal);
+    } else if (strncmp(cmdline, "langmode ", 9) == 0) {
+        cmd_langmode(cons, cmdline);
     } else if (cmdline[0] != 0) {
         if (cmd_app(cons, fat, cmdline) == 0) {
             /* コマンドでなく、アプリでもなく,更に空行でもない */
@@ -277,6 +289,18 @@ void cmd_ncst(struct CONSOLE *cons, char *cmdline, int memtotal) {
         fifo32_put(fifo, cmdline[i] + 256);
     }
     fifo32_put(fifo, 10 + 256); /* Enter */
+    cons_newline(cons);
+    return;
+}
+
+void cmd_langmode(struct CONSOLE *cons, char *cmdline) {
+    struct TASK *task = task_now();
+    unsigned char mode = cmdline[9] - '0';
+    if (mode <= 1) {
+        task->langmode = mode;
+    } else {
+        cons_putstr0(cons, "mode number error.\n");
+    }
     cons_newline(cons);
     return;
 }

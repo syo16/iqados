@@ -19,6 +19,7 @@ run :
 	qemu-system-i386 -drive file=haribote.img,format=raw,if=floppy -boot a
 
 full :
+	$(MAKE) -C lib
 	$(MAKE) -C haribote
 	$(MAKE) -C apilib
 	$(MAKE) -C a
@@ -62,6 +63,7 @@ src_only :
 	-$(DEL) haribote.img
 
 clean_full :
+	$(MAKE) -C lib clean
 	$(MAKE) -C haribote clean
 	$(MAKE) -C apilib clean
 	$(MAKE) -C a clean
@@ -88,6 +90,7 @@ clean_full :
 	$(MAKE) -C iroha clean
 
 src_only_full :
+	$(MAKE) -C lib src_only
 	$(MAKE) -C haribote src_only
 	$(MAKE) -C apilib src_only
 	$(MAKE) -C a src_only

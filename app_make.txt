@@ -25,12 +25,12 @@ $(APP).hrb : $(APP).o $(LIBPATH)libstdio.a $(APILIBPATH)libapi.a ../app.ld
 
 # Image
 haribote.img : $(HARIBOTEPATH)ipl10.bin $(HARIBOTEPATH)haribote.sys $(APP).hrb
-	mformat -f 1440 -C -B ipl10.bin -i haribote.img ::
+	mformat -f 1440 -C -B $(HARIBOTEPATH) ipl10.bin -i haribote.img ::
 	mcopy -i haribote.img $(HARIBOTEPATH)haribote.sys $(APP).hrb ::
 
 # Rule
 %.o : %.c
-	$(CC) $(CFLAGS) -c $*.c -o $*.o
+	$(CC) $(CFLAGS) -g -c $*.c -o $*.o
 
 # -g:generate debug, -f:format, -o:outfile, -l:listfile, elf:ELF32 (i386)
 %.o : %.nas

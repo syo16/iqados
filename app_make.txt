@@ -21,7 +21,7 @@ default :
 	$(MAKE) $(APP).hrb
 
 $(APP).hrb : $(APP).o $(LIBPATH)libstdio.a $(APILIBPATH)libapi.a ../app.ld
-	$(CC_WITH_OPTION) $(CAPPLD) -Wl,'--defsym=__stack=$(STACK)' -g -o $@ $< $(LIBPATH)libstdio.a $(APILIBPATH)libapi.a
+	$(CC_WITH_OPTION) $(CAPPLD) -Wl,'--defsym=__stack=$(STACK)' -g -o $@ $< $(LIBPATH)libstdio.a $(LIBPATH)libstring.a $(APILIBPATH)libapi.a
 
 # Image
 haribote.img : $(HARIBOTEPATH)ipl10.bin $(HARIBOTEPATH)haribote.sys $(APP).hrb

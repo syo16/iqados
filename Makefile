@@ -1,4 +1,4 @@
-APPS = a/a.hrb hello3/hello3.hrb hello4/hello4.hrb hello5/hello5.hrb winhelo/winhelo.hrb winhelo2/winhelo2.hrb winhelo3/winhelo3.hrb star1/star1.hrb stars/stars.hrb stars2/stars2.hrb lines/lines.hrb walk/walk.hrb noodle/noodle.hrb beepdown/beepdown.hrb color/color.hrb color2/color2.hrb sosu/sosu.hrb sosu2/sosu2.hrb sosu3/sosu3.hrb type/type.hrb iroha/iroha.hrb notrec/notrec.hrb
+APPS = a/a.hrb hello3/hello3.hrb hello4/hello4.hrb hello5/hello5.hrb winhelo/winhelo.hrb winhelo2/winhelo2.hrb winhelo3/winhelo3.hrb star1/star1.hrb stars/stars.hrb stars2/stars2.hrb lines/lines.hrb walk/walk.hrb noodle/noodle.hrb beepdown/beepdown.hrb color/color.hrb color2/color2.hrb sosu/sosu.hrb sosu2/sosu2.hrb sosu3/sosu3.hrb type/type.hrb iroha/iroha.hrb notrec/notrec.hrb bball/bball.hrb
 
 MAKE     = make -r
 DEL      = rm -f
@@ -44,6 +44,7 @@ full :
 	$(MAKE) -C type
 	$(MAKE) -C iroha 
 	$(MAKE) -C notrec
+	$(MAKE) -C bball
 	$(MAKE) haribote.img
 
 run_full :
@@ -88,6 +89,7 @@ clean_full :
 	$(MAKE) -C type clean
 	$(MAKE) -C iroha clean
 	$(MAKE) -C notrec clean
+	$(MAKE) -C bball clean
 
 src_only_full :
 	$(MAKE) -C lib src_only
@@ -115,6 +117,7 @@ src_only_full :
 	$(MAKE) -C type src_only
 	$(MAKE) -C iroha src_only
 	$(MAKE) -C notrec src_only
+	$(MAKE) -C bball src_only
 	-$(DEL) haribote.img
 
 refresh :
